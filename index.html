@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Junk Genie</title>
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Body Styling */
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    /* Header Styling */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    /* Logo and Website Name */
+    .logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo img {
+      height: 40px;
+      margin-right: 10px;
+    }
+
+    .logo h1 {
+      font-size: 24px;
+      color: #333;
+    }
+
+    /* Navigation Menu */
+    nav ul {
+      display: flex;
+      list-style: none;
+    }
+
+    nav ul li {
+      margin: 0 15px;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      color: #333;
+      font-size: 16px;
+      position: relative;
+      transition: color 0.3s ease;
+    }
+
+    /* Hover Effect */
+    nav ul li a:hover {
+      color: #008000;
+    }
+
+    nav ul li a::after {
+      content: '';
+      display: block;
+      width: 0;
+      height: 2px;
+      background: #008000;
+      transition: width 0.3s ease;
+      position: absolute;
+      left: 0;
+      bottom: -5px;
+    }
+
+    nav ul li a:hover::after {
+      width: 100%;
+    }
+
+    /* Get Started Button */
+    .get-started {
+      background-color: #008000;
+      color: #fff;
+      padding: 8px 15px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+
+    .get-started:hover {
+      background-color: #005500;
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      height: 100vh;
+      background: url('images/banner4.jpg') no-repeat center center/cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    /* Overlay Content */
+    .hero h1 {
+      font-size: 60px; /* Increased font size */
+      font-family: poppins;
+      text-align: left;
+      color: #eeffed;
+      margin-left: -800px;
+      margin-top: -20px;
+      margin-bottom: 50px;
+      opacity: 0;
+      animation: fadeIn 5s forwards;
+    }
+  
+
+
+    /* Fade In Animation */
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <img src="logo.jpg" alt="Junk Genie Logo">
+      <h1>Junk Genie</h1>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="aboutus.html">About us</a></li>
+       <li><a href="sus.html">Sustainability</a></li>
+       
+        <li><a href="login.php" class="get-started">Get Started</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>Efficient &<br> Eco-Friendly <br>E-Waste <br>Disposal</h1><br>
+    
+  </section>
+</body>
+</html>
+
+
+
+  <!-------------------------------
+  ---------------------------------------
+  -------------------------------------------->
+    <!-- About Us Section -->
+<section class="about-us">
+    <div class="about-content">
+      <h2>About Us</h2>
+      <p>Welcome to Junk Genie – Your Trusted E-Waste Management Platform</p>
+      <p>At Junk Genie, we are passionate about promoting responsible e-waste disposal and recycling. Our mission is to create a sustainable and user-friendly platform that bridges the gap between individuals and organizations looking to dispose of electronic waste and the services dedicated to recycling it.</p>
+  
+      <div class="about-columns">
+        <div class="column mission">
+          <h3>Our Mission</h3>
+          <p>To provide a seamless, transparent, and eco-friendly solution for electronic waste management. We aim to ensure that e-waste is disposed of responsibly, minimizing environmental impact while encouraging sustainable practices.</p>
+        </div>
+        <div class="column vision">
+          <h3>Our Vision</h3>
+          <p>To be the leading platform for e-waste management, driving innovation and community participation towards a greener future.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <style>
+    /* About Us Section */
+    .about-us {
+      padding: 60px 20px;
+      background-color: #f9f9f9;
+    }
+  
+    .about-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+  
+    .about-content h2 {
+      font-size: 28px;
+      color: #333;
+      margin-bottom: 20px;
+    }
+  
+    .about-content p {
+      font-size: 18px;
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+  
+    .about-columns {
+      display: flex;
+      justify-content: space-around;
+      gap: 20px;
+      animation: fadeIn 1s ease-in-out;
+    }
+  
+    .column {
+      flex: 1;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: -1px;
+      transition: transform 0.50s ease;
+    }
+  
+    .column:hover {
+      transform: translateY(-40px);
+    }
+  
+    .column h3 {
+      font-size: 24px;
+      color: #008000;
+      margin-bottom: 10px;
+    }
+  
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+  <!--------------------------------------------
+  -->
+  <html>
+<body>
+<!-- Our Services Section -->
+<section class="our-services">
+    <h1 style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: hsl(120, 100%, 15%);color: rgb(151, 165, 165);">Our Services</h2>
+  
+    <!-- Residential Services -->
+    <div class="category">
+      <h3>Residential Waste</h3>
+      <div class="row">
+        <div class="service-card left">
+          <img src="images/a.webp" alt="Sell E-Waste Online">
+          <div>
+            <h4>Sell E-Waste Online</h4>
+            <p>Get rid of old electronic devices easily and securely.</p>
+          </div>
+        </div>
+        <div class="service-card center">
+          <img src="images/b.webp" alt="Dispose Laptops and Computers">
+          <div>
+            <h4>Dispose Laptops and Computers</h4>
+            <p>Safe and responsible disposal of computers and laptops.</p>
+          </div>
+        </div>
+        <div class="service-card right">
+          <img src="images/c.webp" alt="Sell Battery Scrap">
+          <div>
+            <h4>Sell Battery Scrap</h4>
+            <p>Recycle batteries for a sustainable future.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Commercial Services -->
+    <div class="category">
+      <h3>Commercial Waste</h3>
+      <div class="row">
+        <div class="service-card left">
+          <img src="images/d.webp" alt="Electronics and IT Assets Deposition">
+          <div>
+            <h4>Electronics and IT Assets Deposition</h4>
+            <p>Secure deposition of electronic and IT assets.</p>
+          </div>
+        </div>
+        <div class="service-card center">
+            <img src="images/f.webp" alt="Data Destruction">
+            <div>
+              <h4>Data Destruction</h4>
+              <p>Ensuring secure and certified data destruction.</p>
+            </div>
+          </div>
+        <div class="service-card right">
+          <img src="images/e.webp" alt="Electronics Recycling">
+          <div>
+            <h4>Electronics Recycling</h4>
+            <p>Recycling services for all types of electronic waste.</p>
+          </div>
+        </div>
+      
+      </div>
+    </div>
+  </section>
+  
+  <style>
+    .our-services {
+      padding: 60px 20px;
+      background-color: #f9f9f9;
+      text-align: center;
+    }
+  
+    .category {
+      margin-bottom: 40px;
+    }
+  
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 0;
+    }
+  
+    .service-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: transform 0.3s ease;
+      width: 30%;
+    }
+  
+    .service-card img {
+      width: 100%;
+      height: auto;
+    }
+  
+    .service-card h4 {
+      font-size: 20px;
+      color: #008000;
+      margin: 10px 0 5px;
+    }
+  
+    .service-card p {
+      font-size: 16px;
+      color: #555;
+      padding: 0 10px 10px;
+      text-align: center;
+    }
+  
+    .service-card.left {
+      text-align: left;
+    }
+  
+    .service-card.center {
+      text-align: center;
+    }
+  
+    .service-card.right {
+      text-align: right;
+    }
+  
+    .service-card:hover {
+      transform: translateY(-10px);
+    }
+   
+      /* Roadmap Section */
+      .roadmap {
+        padding: 50px 20px;
+        background-color: #f9f9f9;
+        text-align: center;
+      }
+      
+      .roadmap h2 {
+        font-size: 28px;
+        color: #333;
+        margin-bottom: 30px;
+      }
+      
+      .roadmap-image {
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto 20px;
+        display: block;
+      }
+      
+      .roadmap-container {
+        width: 80%;
+        margin: 0 auto;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .roadmap-step {
+        display: flex;
+        align-items: center;
+        margin-bottom: 50px;
+        position: relative;
+        width: 100%;
+      }
+      
+      .roadmap-step.left .roadmap-icon {
+        margin-right: 20px;
+      }
+      
+      .roadmap-step.right .roadmap-icon {
+        margin-left: 20px;
+      }
+      
+      .roadmap-step.left, .roadmap-step.right {
+        justify-content: center;
+      }
+      
+      .roadmap-container::before {
+        content: '';
+        position: absolute;
+        height: 100%;
+        width: 2px;
+        background-color: #008000;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      
+      .roadmap-icon {
+        width: 50px;
+        height: 50px;
+        background-color: #008000;
+        color: white;
+        font-size: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        position: absolute;
+        top: 0;
+        transform: translateY(-50%);
+      }
+      
+      .roadmap-details {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        min-width: 250px;
+        max-width: 300px;
+        text-align: left;
+        transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+      }
+      
+      .roadmap-details h3 {
+        font-size: 18px;
+        color: #333;
+        margin-bottom: 5px;
+      }
+      
+      .roadmap-details p {
+        font-size: 14px;
+        color: #555;
+      }
+      
+      .roadmap-step.left .roadmap-details {
+        margin-left: 90px;
+      }
+      
+      .roadmap-step.right .roadmap-details {
+        margin-right: 90px;
+      }
+      
+      .roadmap-details:hover,
+      .roadmap-details:focus,
+      .roadmap-details:active {
+        background: rgba(0, 128, 0, 0.1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      }
+      
+      @media (max-width: 768px) {
+        .roadmap-container {
+          width: 100%;
+        }
+        .roadmap-step {
+          flex-direction: column;
+          text-align: center;
+        }
+        .roadmap-step.left .roadmap-icon,
+        .roadmap-step.right .roadmap-icon {
+          margin: 0 0 10px 0;
+        }
+        .roadmap-step.left .roadmap-details,
+        .roadmap-step.right .roadmap-details {
+          margin: 0 auto;
+        }
+        .roadmap-container::before {
+          display: none;
+        }
+      }
+      
+      </style>
+      
+      <section class="roadmap">
+        <img src="images/bus.png" alt="Roadmap Image" class="roadmap-image">
+        <h2 style="font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;">What you want to do?</h2>
+        <div class="roadmap-container">
+          <div class="roadmap-step left">
+            <div class="roadmap-icon">1</div>
+            <div class="roadmap-details">
+              <h3>Register</h3>
+              <p>Create an account to get started with Junk Genie.</p>
+            </div>
+          </div>
+          <div class="roadmap-step right">
+            <div class="roadmap-icon">2</div>
+            <div class="roadmap-details">
+              <h3>Select Category</h3>
+              <p>Choose the type of e-waste you want to dispose of.</p>
+            </div>
+          </div>
+          <div class="roadmap-step left">
+            <div class="roadmap-icon">3</div>
+            <div class="roadmap-details">
+              <h3>Provide Details</h3>
+              <p>Enter additional details about the e-waste items.</p>
+            </div>
+          </div>
+          <div class="roadmap-step right">
+            <div class="roadmap-icon">4</div>
+            <div class="roadmap-details">
+              <h3>Approval</h3>
+              <p>Get confirmation or rejection of your e-waste request.</p>
+            </div>
+          </div>
+          <div class="roadmap-step left">
+            <div class="roadmap-icon">5</div>
+            <div class="roadmap-details">
+              <h3>Schedule Pickup</h3>
+              <p>Choose a convenient date and time for pickup.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+  </body>
+</html>
+  
+  <!--review-->
+ <section class="reviews-section">
+    <h2>What Our Customers Say</h2>
+    <div class="review-item">
+        <div class="profile-pic">
+            <img src="images/alex.jpg" alt="Alex J." />
+        </div>
+        <div class="review-content">
+            <h3>Alex J.</h3>
+            <div class="stars">
+                <span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span>
+            </div>
+            <p>"This service has exceeded my expectations! Great support and quality in eWaste management."</p>
+        </div>
+    </div>
+    <div class="review-item">
+        <div class="profile-pic">
+            <img src="images/jamie.jpeg" alt="Jamie L." />
+        </div>
+        <div class="review-content">
+            <h3>Jamie L.</h3>
+            <div class="stars">
+                <span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span>
+            </div>
+            <p>"Highly recommend! The team handled eWaste responsibly and efficiently."</p>
+        </div>
+    </div>
+    <div class="review-item">
+        <div class="profile-pic">
+            <img src="images/chris.jpg" alt="Chris W." />
+        </div>
+        <div class="review-content">
+            <h3>Chris W.</h3>
+            <div class="stars">
+                <span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span>
+            </div>
+            <p>"Excellent eWaste management service! Smooth process and eco-friendly disposal."</p>
+        </div>
+    </div>
+    
+</section>
+
+<style>
+.reviews-section {
+    padding: 50px;
+    background-color: #f9f9f9;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.reviews-section h2 {
+    font-size: 2.5em;
+    margin-bottom: 30px;
+}
+
+.review-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.profile-pic img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-right: 20px;
+}
+
+.review-content h3 {
+    font-size: 1.5em;
+    margin: 0;
+}
+
+.stars span {
+    color: #ff9800; /* Gold star color */
+}
+
+.review-content p {
+    margin: 10px 0 0;
+    color: #555;
+    font-size: 1em;
+}
+</style>
+<footer>
+  <div class="logo">
+    <img src="logo.jpg" alt="Junk Genie Logo" style="height: 40px; margin-right: 40px;">
+ 
+  </div>
+  <div class="about-us">
+    <h3 style="color: #333;">About Us</h3>
+    <p style="color: #555;">Promoting responsible e-waste disposal and creating a sustainable platform.</p>
+  </div>
+  <div class="social-media">
+    <h3>Follow Us</h3>
+    <a href="#"><img src="images/facebook.png" alt="Facebook"></a>
+    <a href="#"><img src="images/instagram.png" alt="instagram"></a>
+    <a href="#"><img src="images/twitter.png" alt="twitter"></a>
+  </div>
+  <div class="contact-info">
+    <h3>Contact Us</h3>
+    <p>Address: 123 Junk Street, E-Waste City</p>
+    <p>Email: contact@junkgenie.com</p>
+    <p>Phone: +1 234 567 890</p>
+  </div>
+</footer>
+
+<style>
+  footer {
+    background-color: #82f38b;
+    color: white;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    text-align: left;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+  }
+
+  .about-us, .social-media, .contact-info {
+    flex: 1;
+    padding: 20px;
+  }
+
+  .about-us h3, .social-media h3, .contact-info h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .social-media img {
+    width: 30px;
+    margin: 0 5px;
+  }
+
+  .contact-info p {
+    margin-bottom: 10px;
+  }
+</style>
+
+</body></html>  

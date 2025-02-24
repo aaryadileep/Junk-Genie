@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sustainability - Junk Genie</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        /* Header Styles */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 2.5rem;
+            margin-right: 0.625rem;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        /* Navigation Styles */
+        .main-nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1rem;
+        }
+
+        .main-nav a {
+            text-decoration: none;
+            color: #333;
+            font-size: 1rem;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .main-nav a:hover {
+            color: #008000;
+        }
+
+        .main-nav a::after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 2px;
+            background: #008000;
+            transition: width 0.3s ease;
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+        }
+
+        .main-nav a:hover::after {
+            width: 100%;
+        }
+
+        .btn-primary {
+            background-color: #008000;
+            color: #fff !important;
+            padding: 0.5rem 0.9375rem;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #005500;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 100vh;
+            background: url('images/banner.jpg') no-repeat center center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 4rem;
+        }
+
+        .hero h1 {
+            font-size: 3.125rem;
+            color: #72f96b;
+            margin-bottom: 3.125rem;
+            text-align: right;
+            transform: scale(0);
+            animation: popUp 1s forwards;
+        }
+
+        @keyframes popUp {
+            to { transform: scale(1); }
+        }
+
+        /* Content Section */
+        .sustainability-content {
+            padding: 4rem 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .content-block {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 4rem;
+            align-items: center;
+        }
+
+        .content-block--right {
+            flex-direction: row-reverse;
+        }
+
+        .content-block__text {
+            flex: 1;
+        }
+
+        .content-block__text h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        .content-block__text p {
+            margin-bottom: 1rem;
+            color: #555;
+        }
+
+        .content-block__image {
+            flex: 1;
+        }
+
+        .content-block__image img {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Footer Styles */
+        .main-footer {
+            background-color: #82f38b;
+            padding: 2.5rem 1.25rem;
+            color: #333;
+        }
+
+        .main-footer .container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .footer__logo img {
+            height: 2.5rem;
+        }
+
+        .footer__about,
+        .footer__social,
+        .footer__contact {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .footer__social .social-links {
+            display: flex;
+            gap: 0.625rem;
+        }
+
+        .footer__social img {
+            width: 1.875rem;
+            transition: transform 0.3s ease;
+        }
+
+        .footer__social img:hover {
+            transform: scale(1.1);
+        }
+
+        .main-footer h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .main-footer p {
+            margin-bottom: 0.625rem;
+        }
+
+        .main-footer a {
+            color: #333;
+            text-decoration: none;
+        }
+
+        .main-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .content-block,
+            .content-block--right {
+                flex-direction: column;
+            }
+
+            .main-footer .container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer__logo {
+                margin: 0 auto;
+            }
+
+            .footer__social .social-links {
+                justify-content: center;
+            }
+
+            .hero {
+                padding: 2rem;
+                text-align: center;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo">
+            <img src="logo.jpg" alt="Junk Genie Logo">
+            <h1>Junk Genie</h1>
+        </div>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="aboutus.html">About us</a></li>
+                <li><a href="sus.html">Sustainability</a></li>
+                <li><a href="login.php" class="btn-primary">Get Started</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Sustainability<br>Recycle today,<br> renew tomorrow.</h1>
+        </section>
+
+        <section class="sustainability-content">
+            <div class="container">
+                <article class="content-block">
+                    <div class="content-block__text">
+                        <h2>The Growing Challenge of E-Waste</h2>
+                        <p>As technology rapidly advances, the issue of electronic waste (e-waste) becomes increasingly pressing. Each year, around 100 billion pounds of discarded electronics accumulate, with only 20% being responsibly recycled. The remaining 80% often ends up in landfills, stockpiles, or is processed unsafely in developing nations.</p>
+                        <p>This growing mountain of e-waste poses significant environmental and health risks, as it contains toxic heavy metals like lead, mercury, and cadmium that can persist in the body for decades and affect nearly every bodily system.</p>
+                    </div>
+                    <figure class="content-block__image">
+                        <img src="images/sus1.jpg" alt="Visual representation of e-waste challenge">
+                    </figure>
+                </article>
+
+                <article class="content-block content-block--right">
+                    <div class="content-block__text">
+                        <h2>Promoting Sustainable E-Waste Management</h2>
+                        <p>To address this, it's crucial to promote sustainable practices in handling e-waste. By fostering a culture of responsible recycling and reuse, we can mitigate the adverse effects on health and the environment.</p>
+                        <p>This approach not only reduces hazardous waste but also supports a circular economy, benefiting society, the economy, and the planet. Encouraging sustainable practices in e-waste management is essential for a healthier, safer future.</p>
+                    </div>
+                    <figure class="content-block__image">
+                        <img src="images/sus2.jpg" alt="Sustainable e-waste management practices">
+                    </figure>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer__logo">
+                <img src="logo.jpg" alt="Junk Genie Logo">
+            </div>
+            <div class="footer__about">
+                <h3>About Us</h3>
+                <p>Promoting responsible e-waste disposal and creating a sustainable platform.</p>
+            </div>
+            <div class="footer__social">
+                <h3>Follow Us</h3>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><img src="images/facebook.png" alt="Facebook"></a>
+                    <a href="#" aria-label="Instagram"><img src="images/instagram.png" alt="Instagram"></a>
+                    <a href="#" aria-label="Twitter"><img src="images/twitter.png" alt="Twitter"></a>
+                </div>
+            </div>
+            <div class="footer__contact">
+                <h3>Contact Us</h3>
+                <address>
+                    <p>123 Junk Street, E-Waste City</p>
+                    <p>Email: <a href="mailto:contact@junkgenie.com">contact@junkgenie.com</a></p>
+                    <p>Phone: <a href="tel:+12345678900">+1 234 567 890</a></p>
+                </address>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

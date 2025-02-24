@@ -1,0 +1,116 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Changed to align container to left */
+    font-family: Arial, sans-serif;
+    overflow: hidden; /* Prevent scrolling */
+}
+
+.container {
+    display: flex;
+    width: 65%; /* Reduced from 80% */
+    height: 70vh; /* Reduced from 80vh */
+    max-width: 800px; /* Reduced from 1000px */
+    position: relative; /* Added for mascot positioning */
+    margin-left: 2rem; /* Added space from left edge */
+    box-shadow: 0 0 20px rgba(0,0,0,0.1); /* Optional: adds subtle shadow */
+    border-radius: 10px; /* Optional: rounded corners */
+}
+
+.left-section {
+    width: 35%; /* Slightly increased to maintain proportions */
+    background-color: #7FE0A1;
+    padding: 1rem; /* Reduced from 1.2rem */
+    position: relative;
+    border-radius: 40px; /* Reduced from 50px to match smaller size */
+}
+
+.left-section h1 {
+    font-family: 'Yusei Magic', sans-serif;
+    font-size: 2rem; /* Reduced font size */
+    margin-bottom: 1.5rem; /* Reduced margin */
+}
+
+.mascot {
+    position: absolute; /* Changed to absolute positioning */
+    max-width: 250px; /* Reduced from 200px */
+    right: -90px; /* Adjusted positioning */
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2; /* Ensure mascot is above both sections */
+}
+
+.right-section {
+    width: 65%;
+    padding: 2rem 2.5rem 1rem 6rem; /* Added top padding back */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centers content vertically */
+}
+
+h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem; /* Reduced margin */
+}
+
+.form-group {
+    margin-bottom: 0.8rem;
+    padding-left: 10rem; /* Added padding to move elements to the right */
+}
+
+label {
+    display: block;
+    margin-bottom: 0.3rem; /* Reduced margin */
+    font-size: 0.9rem; /* Reduced font size */
+}
+
+input {
+    width: 100%;
+    padding: 0.6rem; /* Reduced padding */
+    border: none;
+    background-color: #E8F8EF;
+    border-radius: 5px;
+}
+
+.sign-in-btn {
+    width: 40%; /* Reduced width */
+    padding: 0.6rem; /* Slightly reduced padding */
+    background-color: #7FE0A1;
+    border: none;
+    border-radius: 25px; /* More rounded corners */
+    color: black;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin: 0.8rem auto; /* Center the button */
+    display: block; /* Makes margin auto work */
+    margin-bottom: 1rem; /* Add space below the button */
+}
+
+.login-link {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #333;
+    margin-top: 0.5rem;
+    width: 100%;
+}
+
+.login-link a {
+    color: #7FE0A1;
+    text-decoration: none;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+/* Optional: Add hover effect for button */
+.sign-in-btn:hover {
+    background-color: #6cc88d;
+    transform: scale(1.02);
+    transition: all 0.2s ease;
+} 
