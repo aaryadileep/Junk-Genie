@@ -9,6 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
+//hello
 
 // Fetch user details from the database
 $query = "SELECT fullname, email, phone FROM users WHERE user_id = ?";
