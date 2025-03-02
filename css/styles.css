@@ -1,0 +1,162 @@
+:root {
+    --jg-primary: #7FE0A1;
+    --jg-primary-hover: #6cc88d;
+    --jg-primary-light: #E8F8EF;
+    --jg-secondary: #333333;
+}
+
+body {
+    background-color: #f8f9fa;
+    font-family: 'Yusei Magic', sans-serif;
+}
+
+.mascot {
+    max-width: 150px;
+    margin: 0 auto;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+}
+
+/* Form Controls */
+.form-control,
+input {
+    background-color: var(--jg-primary-light);
+}
+
+.form-control:focus {
+    border-color: var(--jg-primary);
+    box-shadow: 0 0 0 0.2rem rgba(127, 224, 161, 0.25);
+}
+
+/* OTP Input Styling */
+.otp-input-container {
+    position: relative;
+}
+
+.form-control-lg {
+    height: 60px;
+    font-size: 24px;
+    letter-spacing: 0.5em;
+    font-weight: bold;
+}
+
+.form-control-lg::placeholder {
+    letter-spacing: normal;
+    font-size: 16px;
+    font-weight: normal;
+}
+
+/* Timer styling */
+#timer {
+    color: var(--jg-secondary);
+    font-size: 0.9em;
+}
+
+/* Buttons */
+.btn-primary,
+.sign-in-btn {
+    background-color: var(--jg-primary);
+    border-color: var(--jg-primary);
+    color: var (--jg-secondary);
+    border-radius: 25px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover:not(:disabled),
+.btn-primary:focus,
+.btn-primary:active,
+.sign-in-btn:hover {
+    background-color: var(--jg-primary-hover) !important;
+    border-color: var(--jg-primary-hover) !important;
+    transform: translateY(-2px);
+}
+
+.btn-primary:disabled {
+    background-color: var(--jg-primary);
+    border-color: var(--jg-primary);
+    opacity: 0.65;
+}
+
+.btn:disabled {
+    cursor: not-allowed;
+}
+
+/* Links */
+a {
+    color: var(--jg-primary);
+}
+
+a:hover {
+    color: var(--jg-primary-hover);
+}
+
+/* Link styling */
+.btn-link {
+    color: var(--jg-primary);
+    text-decoration: none;
+}
+
+.btn-link:hover:not(:disabled) {
+    color: var(--jg-primary-hover);
+}
+
+.btn-link:disabled {
+    opacity: 0.6;
+}
+
+/* Card Styling */
+.card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.bg-primary,
+.left-section {
+    background-color: var(--jg-primary) !important;
+}
+
+/* Validation Styles */
+.invalid-feedback {
+    display: block;
+    color: #dc3545;
+}
+
+.is-valid {
+    border-color: var(--jg-primary) !important;
+}
+
+.valid-feedback {
+    color: var(--jg-primary);
+}
+
+/* Bootstrap Overrides */
+.nav-link.active {
+    background-color: var(--jg-primary) !important;
+    color: white !important;
+}
+
+/* Alert Styles */
+.alert-primary {
+    background-color: var(--jg-primary-light);
+    border-color: var(--jg-primary);
+    color: var(--jg-secondary);
+}
+
+.alert {
+    border-radius: 10px;
+}
+
+.alert-danger {
+    background-color: #fff2f2;
+    border-color: #dc3545;
+}
+
+/* Floating label customization */
+.form-floating label {
+    color: #6c757d;
+}
+
+.form-floating>.form-control:focus~label,
+.form-floating>.form-control:not(:placeholder-shown)~label {
+    color: var(--jg-primary);
+}

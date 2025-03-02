@@ -2,50 +2,68 @@
 session_start();
 require 'connect.php';
 
-if (!isset($_GET['token'])) {
+// Validate token
+$token = isset($_GET['token']) ? trim($_GET['token']) : '';
+if (empty($token)) {
     $_SESSION['error'] = "Invalid reset link.";
     header("Location: login.php");
     exit();
 }
 
-$token = $_GET['token'];
+// For debugging only - remove these lines in production
+error_log("Received token: " . $token);
 
-// Check if the token is valid and not expired
-$stmt = $conn->prepare("SELECT * FROM users WHERE reset_token = ? AND reset_token_expiry > NOW()");
+// Check token validity and expiration
+$stmt = $conn->prepare("SELECT user_id FROM users WHERE reset_token = ? AND reset_token_expiry > NOW()");
 $stmt->bind_param("s", $token);
 $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 
+// Remove the debug var_dump and exit() statements
+// var_dump([
+//     'token' => $token,
+//     'query' => "SELECT user_id FROM users WHERE reset_token = '$token' AND reset_token_expiry > NOW()"
+// ]);
+// exit();
+
 if (!$user) {
-    $_SESSION['error'] = "Invalid or expired token. Please request a new password reset link.";
-    header("Location: login.php");
+    $_SESSION['error'] = "Invalid or expired reset token. Please request a new password reset link.";
+    header("Location: forgotpassword.php");
     exit();
 }
 
+$error = '';
+$success = '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $new_password = $_POST['new_password'];
-    $confirm_password = $_POST['confirm_password'];
+    $new_password = trim($_POST['new_password']);
+    $confirm_password = trim($_POST['confirm_password']);
     
-    // Validate password
     if (strlen($new_password) < 8) {
-        $_SESSION['error'] = "Password must be at least 8 characters long.";
+        $error = "Password must be at least 8 characters long.";
     } elseif ($new_password !== $confirm_password) {
-        $_SESSION['error'] = "Passwords do not match.";
+        $error = "Passwords do not match.";
     } else {
-        // Hash password and update database
-        $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
-        
-        // Update the user's password and clear the reset token
-        $stmt = $conn->prepare("UPDATE users SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE id = ?");
-        $stmt->bind_param("si", $hashed_password, $user['id']);
-        
-        if ($stmt->execute()) {
-            $_SESSION['message'] = "Password reset successfully. You can now login.";
-            header("Location: login.php");
-            exit();
-        } else {
-            $_SESSION['error'] = "Failed to update password. Please try again.";
+        try {
+            $conn->begin_transaction();
+            
+            $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+            $stmt = $conn->prepare("UPDATE users SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE user_id = ? AND reset_token = ?");
+            $stmt->bind_param("sis", $hashed_password, $user['user_id'], $token);
+            
+            if ($stmt->execute() && $stmt->affected_rows > 0) {
+                $conn->commit();
+                $_SESSION['message'] = "Password has been reset successfully. Please login with your new password.";
+                header("Location: login.php");
+                exit();
+            } else {
+                throw new Exception("Failed to update password");
+            }
+        } catch (Exception $e) {
+            $conn->rollback();
+            $error = "Failed to reset password. Please try again.";
+            error_log($e->getMessage());
         }
     }
 }
@@ -56,62 +74,107 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset Password - Junk Genie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Yusei+Magic&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 400px;
-            margin: 40px auto;
-            padding: 20px;
+        .container {
+            width: 400px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+        }
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-family: 'Yusei Magic', sans-serif;
         }
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 1.5rem;
         }
         .form-group label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 0.5rem;
+            color: #555;
         }
         .form-group input {
             width: 100%;
-            padding: 8px;
+            padding: 10px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.2);
+        }
+        .password-requirements {
+            font-size: 12px;
+            color: #666;
+            margin-top: 0.5rem;
         }
         .error {
             color: #dc3545;
-            margin-bottom: 15px;
+            background-color: #ffe6e6;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            text-align: center;
         }
-        .btn {
-            background-color: #28a745;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
+        .btn-reset {
             width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
         }
-        .btn:hover {
-            background-color: #218838;
+        .btn-reset:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
-    <h2>Reset Password</h2>
-    <?php if (isset($_SESSION['error'])): ?>
-        <div class="error"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
-    <?php endif; ?>
-    
-    <form action="resetpassword.php?token=<?php echo htmlspecialchars($token); ?>" method="POST">
-        <div class="form-group">
-            <label for="new_password">New Password:</label>
-            <input type="password" name="new_password" id="new_password" required 
-                   minlength="8" placeholder="Enter new password">
-        </div>
-        <div class="form-group">
-            <label for="confirm_password">Confirm Password:</label>
-            <input type="password" name="confirm_password" id="confirm_password" required 
-                   minlength="8" placeholder="Confirm new password">
-        </div>
-        <button type="submit" class="btn">Reset Password</button>
-    </form>
+    <div class="container">
+        <h2>Reset Password</h2>
+        <?php if ($error): ?>
+            <div class="error"><?php echo htmlspecialchars($error); ?></div>
+        <?php endif; ?>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="new_password">New Password</label>
+                <input type="password" 
+                       id="new_password" 
+                       name="new_password" 
+                       required 
+                       minlength="8"
+                       autocomplete="new-password"
+                       placeholder="Enter new password">
+                <div class="password-requirements">
+                    Password must be at least 8 characters long
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" 
+                       id="confirm_password" 
+                       name="confirm_password" 
+                       required 
+                       minlength="8"
+                       autocomplete="new-password"
+                       placeholder="Confirm your password">
+            </div>
+            <input type="hidden" name="token" value="<?php echo htmlspecialchars($token); ?>">
+            <button type="submit" class="btn-reset">Reset Password</button>
+        </form>
+    </div>
 </body>
 </html>

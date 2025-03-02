@@ -1,55 +1,51 @@
 <?php
 session_start();
+$page_title = 'Forgot Password - Junk Genie';
+require_once 'includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forgot Password</title>
-    <style>
-        .message {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-        }
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-    </style>
-</head>
-<body>
-    <h2>Forgot Password</h2>
 
-    <!-- Display success or error messages -->
-    <?php if (isset($_SESSION['message'])): ?>
-        <div class="message success">
-            <?php echo $_SESSION['message']; ?>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="row g-0">
+                    <div class="col-md-4 bg-primary text-white text-center p-4">
+                        <div class="my-auto">
+                            <h1 class="display-6">Reset<br>Password</h1>
+                            <img src="images/genie.png" alt="JunkGenie Mascot" class="img-fluid mascot mt-4">
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body p-4">
+                            <h2 class="card-title text-center mb-4">Forgot Password</h2>
+                            
+                            <?php if (isset($_SESSION['message'])): ?>
+                                <div class="alert alert-success">
+                                    <?php echo htmlspecialchars($_SESSION['message']); unset($_SESSION['message']); ?>
+                                </div>
+                            <?php endif; ?>
+                            
+                            <form action="send_otp.php" method="POST" id="forgotPasswordForm">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                    <div class="invalid-feedback" id="emailError"></div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100">
+                                    Send Reset OTP
+                                </button>
+
+                                <div class="text-center mt-3">
+                                    <a href="login.php">Back to Login</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <?php unset($_SESSION['message']); ?>
-    <?php endif; ?>
-
-    <?php if (isset($_SESSION['error'])): ?>
-        <div class="message error">
-            <?php echo $_SESSION['error']; ?>
-        </div>
-        <?php unset($_SESSION['error']); ?>
-    <?php endif; ?>
-
-    <!-- Forgot Password Form -->
-    <form action="send_reset_link.php" method="POST">
-        <label for="email">Email:</label>
-        <input type="email" name="email" id="email" required>
-        <button type="submit">Send Reset Link</button>
-    </form>
-
-    <p>Remember your password? <a href="login.php">Login here</a></p>
+    </div>
+</div>
 </body>
 </html>

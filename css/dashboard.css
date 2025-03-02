@@ -1,0 +1,125 @@
+:root {
+    --primary: #7FE0A1;
+    --primary-dark: #6cc88d;
+    --secondary: #F5F5F5;
+    --text-dark: #333;
+    --text-light: #777;
+    --white: #fff;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --radius: 8px;
+}
+
+/* Header Styles */
+.dashboard-header {
+    background: var(--white);
+    box-shadow: var(--shadow);
+    padding: 1rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.location-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.5rem 1rem;
+    background: var(--secondary);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.location-indicator:hover {
+    background: #e9ecef;
+}
+
+.location-indicator i {
+    color: var(--primary);
+}
+
+/* Profile Menu */
+.profile-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.profile-info {
+    text-align: right;
+}
+
+.profile-name {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.profile-email {
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+.profile-pic {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary);
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+/* Features Grid */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.feature-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 2rem;
+    text-align: center;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 1rem;
+}
+
+/* Action Button */
+.action-button {
+    background: var(--primary);
+    color: var(--text-dark);
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(127, 224, 161, 0.3);
+}
+
+.action-button:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}

@@ -1,29 +1,29 @@
 <?php
 session_start();
-require 'connect.php'; // Include the MySQLi database connection file
+require 'connect.php';
 
-if (!isset($_GET['token'])) {
-    header("Location: login.php");
-    exit();
-}
-
-$token = $_GET['token'];
-
-// Verify the token
-$stmt = $conn->prepare("SELECT user_id FROM users WHERE email_verification_token = ?");
-$stmt->bind_param("s", $token);
-$stmt->execute();
-$stmt->store_result();
-
-if ($stmt->num_rows > 0) {
-    // Mark the email as verified
-    $stmt = $conn->prepare("UPDATE users SET is_verified = 'Yes', email_verification_token = NULL WHERE email_verification_token = ?");
+if (isset($_GET['token'])) {
+    $token = trim($_GET['token']);
+    
+    $stmt = $conn->prepare("SELECT id FROM users WHERE verification_token = ?");
     $stmt->bind_param("s", $token);
     $stmt->execute();
-
-    $_SESSION['message'] = "Email verified successfully. You can now login.";
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        $stmt = $conn->prepare("UPDATE users SET email_verified = 1, verification_token = NULL WHERE verification_token = ?");
+        $stmt->bind_param("s", $token);
+        
+        if ($stmt->execute()) {
+            $_SESSION['message'] = "Email verified successfully! You can now login.";
+        } else {
+            $_SESSION['error'] = "Verification failed. Please try again.";
+        }
+    } else {
+        $_SESSION['error'] = "Invalid verification token.";
+    }
 } else {
-    $_SESSION['error'] = "Invalid verification token.";
+    $_SESSION['error'] = "No verification token provided.";
 }
 
 header("Location: login.php");
