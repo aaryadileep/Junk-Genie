@@ -2,22 +2,21 @@
 session_start();
 require_once 'connect.php';
 
-// Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
 $user_id = $_SESSION['user_id'];
-
-
-// Fetch user details from the database
-$query = "SELECT fullname, email, phone FROM users WHERE user_id = ?";
+$query = "SELECT u.fullname, u.email, u.phone, c.city_name 
+          FROM users u 
+          LEFT JOIN cities c ON u.city_id = c.city_id 
+          WHERE u.user_id = ?";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$stmt->bind_result($fullname, $email, $phone);
-$stmt->fetch();
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
 $stmt->close();
 ?>
 
@@ -26,251 +25,343 @@ $stmt->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile | JunkGenie</title>
+    <title>My Profile | JunkGenie</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
+            :root {
             --primary: #4CAF50;
             --primary-dark: #388E3C;
+            --primary-light: #C8E6C9;
             --secondary: #F5F5F5;
-            --text-dark: #333;
-            --text-light: #777;
-            --white: #fff;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --radius: 8px;
+            --success: #4CAF50;
+            --danger: #f44336;
+            --warning: #ff9800;
+            --info: #2196f3;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-
-        body { 
-            background-color: var(--secondary); 
-            color: var(--text-dark); 
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
         }
 
-        .container {
-            max-width: 600px;
+        .profile-container {
+            max-width: 800px;
+            margin: 100px auto 30px;
+            padding: 0 20px;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .profile-header {
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            padding: 30px;
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid white;
+            margin: 0 auto 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .profile-avatar img {
             width: 100%;
-            margin: 2rem;
-            padding: 2.5rem;
-            background-color: var(--white);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
             text-align: center;
         }
 
-        h2 { 
-            color: var(--primary-dark); 
-            margin-bottom: 1.5rem; 
-            font-size: 2rem;
+        .stat-value {
+            font-size: 24px;
             font-weight: 600;
         }
 
-        .profile-info { 
-            margin-bottom: 2rem; 
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
         }
 
-        .profile-info div {
+        .profile-body {
+            padding: 30px;
+        }
+
+        .info-group {
+            margin-bottom: 25px;
+        }
+
+        .info-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
+            gap: 10px;
         }
 
-        .profile-info div:hover {
-            background-color: var(--secondary);
+        .info-value i {
+            color: var(--primary);
         }
 
-        .profile-info i { 
-            color: var(--primary); 
-            margin-right: 10px; 
-            font-size: 1.2rem;
+        .edit-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 500;
+            transition: all 0.3s ease;
         }
 
-        .edit-form input {
-            width: 100%;
+        .edit-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .verification-badge {
+            background: var(--success);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        /* Modal Styles */
+        .modal-content {
+            border-radius: 15px;
+        }
+
+        .modal-header {
+            background: var(--primary);
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .form-control {
+            border-radius: 10px;
             padding: 12px;
             margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: var(--radius);
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
         }
 
-        .edit-form input:focus {
+        .form-control:focus {
             border-color: var(--primary);
-            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
         }
-
-        .error-msg {
-            color: red;
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-            text-align: left;
-        }
-
-        .save-btn {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--primary);
-            color: var(--white);
-            border: none;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 500;
-            transition: background-color 0.3s ease;
-        }
-
-        .save-btn:hover { 
-            background-color: var(--primary-dark); 
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 1.5rem;
-            }
-
-            h2 {
-                font-size: 1.75rem;
-            }
-
-            .profile-info div {
-                font-size: 0.9rem;
-            }
-
-            .edit-form input {
-                font-size: 0.9rem;
-            }
-
-            .save-btn {
-                font-size: 0.9rem;
-            }
-        }
+    </style>
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <h2>Your Profile</h2>
-        
-        <div class="profile-info">
-            <div><i class="fas fa-user"></i> <span id="displayFullname"><?php echo htmlspecialchars($fullname); ?></span></div>
-            <div><i class="fas fa-envelope"></i> <span id="displayEmail"><?php echo htmlspecialchars($email); ?></span></div>
-            <div><i class="fas fa-phone"></i> <span id="displayPhone"><?php echo htmlspecialchars($phone); ?></span></div>
+    <!-- Navigation Header -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="index.php">
+                <img src="logo.jpg" alt="JunkGenie" height="40">
+                <span class="ms-2 text-success fw-bold">JunkGenie</span>
+            </a>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-success" onclick="window.location.href='userdashboard.php'">
+                    <i class="fas fa-arrow-left me-2"></i>Back
+                </button>
+            </div>
         </div>
+    </nav>
 
-        <form id="editProfileForm">
-            <input type="text" id="fullname" name="fullname" placeholder="Full Name" value="<?php echo htmlspecialchars($fullname); ?>" required>
-            <p class="error-msg" id="fullnameError"></p>
+    <!-- Profile Content -->
+    <div class="profile-container">
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <img src="images/profile.jpg" alt="Profile Picture">
+                </div>
+                <h4 class="mb-1"><?php echo htmlspecialchars($user['fullname']); ?></h4>
+                <p class="mb-3"><?php echo htmlspecialchars($user['city_name'] ?? 'City not set'); ?></p>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Orders</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Points</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">₹0</div>
+                        <div class="stat-label">Earnings</div>
+                    </div>
+                </div>
+            </div>
 
-            <input type="email" id="email" name="email" placeholder="Email" value="<?php echo htmlspecialchars($email); ?>" required>
-            <p class="error-msg" id="emailError"></p>
+            <div class="profile-body">
+                <div class="info-group">
+                    <div class="info-label">Email Address</div>
+                    <div class="info-value">
+                        <i class="fas fa-envelope"></i>
+                        <?php echo htmlspecialchars($user['email']); ?>
+                        <span class="verification-badge"><i class="fas fa-check me-1"></i>Verified</span>
+                    </div>
+                </div>
 
-            <input type="tel" id="phone" name="phone" placeholder="Phone Number" value="<?php echo htmlspecialchars($phone); ?>" required>
-            <p class="error-msg" id="phoneError"></p>
+                <div class="info-group">
+                    <div class="info-label">Phone Number</div>
+                    <div class="info-value">
+                        <i class="fas fa-phone"></i>
+                        <span id="displayPhone"><?php echo htmlspecialchars($user['phone']); ?></span>
+                    </div>
+                </div>
 
-            <button class="save-btn" type="button" onclick="updateProfile()">Save Changes</button>
-        </form>
+                <div class="d-grid gap-2">
+                    <button class="edit-btn" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                        <i class="fas fa-edit me-2"></i>Edit Profile
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <!-- Edit Profile Modal -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editProfileForm">
+                        <div class="mb-3">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" 
+                                   value="<?php echo htmlspecialchars($user['phone']); ?>" required>
+                            <div class="invalid-feedback" id="phoneError"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Old Password</label>
+                            <input type="password" class="form-control" id="oldPassword" name="oldPassword" required>
+                            <div class="invalid-feedback" id="oldPasswordError"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                            <div class="invalid-feedback" id="newPasswordError"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                            <div class="invalid-feedback" id="confirmPasswordError"></div>
+                        </div>
+                        <button type="button" class="btn btn-success w-100" onclick="updateProfile()">
+                            Save Changes
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function updateProfile() {
-            let fullname = document.getElementById("fullname").value.trim();
-            let email = document.getElementById("email").value.trim();
-            let phone = document.getElementById("phone").value.trim();
+    console.log("Update Profile function called"); // Debugging
 
-            // Client-side validation
-            if (!/^[A-Z][a-z]*(?: [A-Z][a-z]*)*$/.test(fullname)) {
-                document.getElementById("fullnameError").innerText = "Full name must start with a capital letter.";
-                return;
-            } else {
-                document.getElementById("fullnameError").innerText = "";
-            }
+    const phone = document.getElementById('phone').value.trim();
+    const oldPassword = document.getElementById('oldPassword').value.trim();
+    const newPassword = document.getElementById('newPassword').value.trim();
+    const confirmPassword = document.getElementById('confirmPassword').value.trim();
 
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                document.getElementById("emailError").innerText = "Invalid email format.";
-                return;
-            } else {
-                document.getElementById("emailError").innerText = "";
-            }
+    // Clear previous errors
+    document.getElementById('phoneError').textContent = '';
+    document.getElementById('oldPasswordError').textContent = '';
+    document.getElementById('newPasswordError').textContent = '';
+    document.getElementById('confirmPasswordError').textContent = '';
 
-            if (!/^[6789]\d{9}$/.test(phone)) {
-                document.getElementById("phoneError").innerText = "Invalid phone number.";
-                return;
-            } else {
-                document.getElementById("phoneError").innerText = "";
-            }
-
-            // Prepare data to send to PHP
-            let formData = new FormData();
-            formData.append("fullname", fullname);
-            formData.append("email", email);
-            formData.append("phone", phone);
-
-            fetch("profile.php", {
-                method: "POST",
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === "success") {
-                    alert(data.message);
-                    document.getElementById("displayFullname").innerText = fullname;
-                    document.getElementById("displayEmail").innerText = email;
-                    document.getElementById("displayPhone").innerText = phone;
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => console.error("Error:", error));
-        }
-    </script>
-
-    <?php
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $fullname = trim($_POST["fullname"]);
-        $email = trim($_POST["email"]);
-        $phone = trim($_POST["phone"]);
-
-        if (!preg_match("/^[A-Z][a-z]*(?: [A-Z][a-z]*)*$/", $fullname)) {
-            echo json_encode(["status" => "error", "message" => "Full name must start with a capital letter."]);
-            exit();
-        }
-
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            echo json_encode(["status" => "error", "message" => "Invalid email format."]);
-            exit();
-        }
-
-        if (!preg_match("/^[6789]\d{9}$/", $phone)) {
-            echo json_encode(["status" => "error", "message" => "Invalid phone number."]);
-            exit();
-        }
-
-        $query = "UPDATE users SET fullname = ?, email = ?, phone = ? WHERE user_id = ?";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("sssi", $fullname, $email, $phone, $user_id);
-
-        if ($stmt->execute()) {
-            $_SESSION["fullname"] = $fullname;
-            $_SESSION["email"] = $email;
-            $_SESSION["phone"] = $phone;
-            echo json_encode(["status" => "success", "message" => "Profile updated successfully!"]);
-        } else {
-            echo json_encode(["status" => "error", "message" => "Failed to update profile."]);
-        }
-
-        $stmt->close();
-        $conn->close();
+    // Validate phone number
+    if (!/^[6789]\d{9}$/.test(phone)) {
+        document.getElementById('phoneError').textContent = 'Enter a valid 10-digit phone number';
+        return;
     }
-    ?>
+
+    // Validate old password
+    if (oldPassword === '') {
+        document.getElementById('oldPasswordError').textContent = 'Old password is required';
+        return;
+    }
+
+    // Validate new password
+    if (newPassword.length < 8) {
+        document.getElementById('newPasswordError').textContent = 'Password must be at least 8 characters';
+        return;
+    }
+
+    // Validate confirm password
+    if (newPassword !== confirmPassword) {
+        document.getElementById('confirmPasswordError').textContent = 'Passwords do not match';
+        return;
+    }
+
+    // Send data to server
+    const formData = new FormData();
+    formData.append('phone', phone);
+    formData.append('oldPassword', oldPassword);
+    formData.append('newPassword', newPassword);
+
+    console.log("Sending data to server:", { phone, oldPassword, newPassword }); // Debugging
+
+    fetch('updateprofile.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        console.log("Response received:", response); // Debugging
+        return response.json();
+    })
+    .then(data => {
+        console.log("Data received:", data); // Debugging
+        if (data.success) {
+            // Update displayed phone number
+            document.getElementById('displayPhone').textContent = phone;
+            // Close modal
+            bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
+            alert('Profile updated successfully!');
+        } else {
+            // Display errors
+            document.getElementById('oldPasswordError').textContent = data.errors.oldPassword ?? '';
+            document.getElementById('newPasswordError').textContent = data.errors.newPassword ?? '';
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error); // Debugging
+        alert('An error occurred. Please try again.');
+    });
+}
+    </script>
 </body>
 </html>

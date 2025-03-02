@@ -20,14 +20,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $conn->begin_transaction();
             
             // Insert user data
-            $stmt = $conn->prepare("INSERT INTO users (fullname, email, phone, password, role) VALUES (?, ?, ?, ?, 'User')");
-            $stmt->bind_param("ssss", 
+            $stmt = $conn->prepare("INSERT INTO users (fullname, email, phone, password, role, city_id) VALUES (?, ?, ?, ?, 'End User', ?)");
+            $stmt->bind_param("ssssi", 
                 $registration['fullname'],
                 $registration['email'],
                 $registration['phone'],
-                $registration['password']
+                $registration['password'],
+                $registration['city_id'] // Ensure this is an integer
             );
-            
             if ($stmt->execute()) {
                 $conn->commit();
                 unset($_SESSION['registration']);
