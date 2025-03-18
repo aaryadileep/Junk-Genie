@@ -176,8 +176,41 @@ $stmt->close();
             border-color: var(--primary);
             box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
         }
+       
+.profile-action-btn {
+    padding: 15px;
+    border-radius: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 1px solid #eee;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.profile-action-btn i {
+    font-size: 1.2rem;
+}
+
+.btn-danger {
+    background: #ff4444;
+    border-color: #ff4444;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #cc0000;
+    border-color: #cc0000;
+    color: white;
+}
     </style>
-    </style>
+    
 </head>
 <body>
     <!-- Navigation Header -->
@@ -228,9 +261,8 @@ $stmt->close();
                         <?php echo htmlspecialchars($user['email']); ?>
                         <span class="verification-badge"><i class="fas fa-check me-1"></i>Verified</span>
                     </div>
-                </div>
 
-                <div class="info-group">
+                    <div class="info-group">
                     <div class="info-label">Phone Number</div>
                     <div class="info-value">
                         <i class="fas fa-phone"></i>
@@ -238,10 +270,48 @@ $stmt->close();
                     </div>
                 </div>
 
-                <div class="d-grid gap-2">
-                    <button class="edit-btn" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-                        <i class="fas fa-edit me-2"></i>Edit Profile
+                
+                    <div class="d-grid gap-2">
+        <button class="edit-btn" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+            <i class="fas fa-edit me-2"></i>Edit Profile
+        </button>
+
+        <!-- 4 Buttons -->
+        <div class="mt-4">
+            <div class="row g-3">
+                <div class="col-6">
+                    <button class="btn btn-light w-100 profile-action-btn" onclick="window.location.href='loyalty-points.php'">
+                        <i class="fas fa-star text-warning me-2"></i>
+                        <span>Loyalty Points</span>
+                        <span class="badge bg-warning text-dark ms-2">0</span>
                     </button>
+                </div>
+                <div class="col-6">
+                    <button class="btn btn-light w-100 profile-action-btn" onclick="window.location.href='addresses.php'">
+                        <i class="fas fa-map-marker-alt text-info me-2"></i>
+                        <span>Addresses</span>
+                    </button>
+                </div>
+                <div class="col-6">
+                    <button class="btn btn-light w-100 profile-action-btn" onclick="window.location.href='orders.php'">
+                        <i class="fas fa-shopping-bag text-success me-2"></i>
+                        <span>My Orders</span>
+                    </button>
+                </div>
+                <div class="col-6">
+                    <button class="btn btn-danger w-100 profile-action-btn" onclick="confirmLogout()">
+                        <i class="fas fa-sign-out-alt me-2"></i>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+                </div>
+
+             
+
                 </div>
             </div>
         </div>
@@ -361,6 +431,12 @@ $stmt->close();
         console.error("Error:", error); // Debugging
         alert('An error occurred. Please try again.');
     });
+}
+// Add this to your existing <script> section
+function confirmLogout() {
+    if (confirm('Are you sure you want to logout?')) {
+        window.location.href = 'logout.php';
+    }
 }
     </script>
 </body>

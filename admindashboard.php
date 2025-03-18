@@ -27,13 +27,14 @@ $fullname = $_SESSION['fullname'];
         }
 
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #34495e;
-            --accent-color: #3498db;
+            --primary-color: #4CAF50; /* Green */
+            --secondary-color: #388E3C; /* Dark Green */
+            --accent-color: #8BC34A; /* Light Green */
             --success-color: #2ecc71;
             --warning-color: #f1c40f;
             --danger-color: #e74c3c;
             --background-color: #f5f6fa;
+            --text-color: #333;
         }
 
         body {
@@ -60,6 +61,15 @@ $fullname = $_SESSION['fullname'];
             margin-bottom: 30px;
             text-align: center;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
         }
 
         .nav-menu {
@@ -105,8 +115,20 @@ $fullname = $_SESSION['fullname'];
             margin-bottom: 30px;
             background-color: white;
             padding: 15px;
-           
-            0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        .header h1 img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
         }
 
         .profile-dropdown {
@@ -198,7 +220,7 @@ $fullname = $_SESSION['fullname'];
         }
 
         .btn-primary:hover {
-            background-color: #2980b9;
+            background-color: var(--secondary-color);
         }
 
         /* Responsive Design */
@@ -222,12 +244,15 @@ $fullname = $_SESSION['fullname'];
 </head>
 <body>
     <div class="sidebar">
-        <div class="logo">Admin</div>
+        <div class="logo">
+            <img src="logo.jpg" alt="JunkGenie Logo">
+            JunkGenie
+        </div>
         <ul class="nav-menu">
             <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-tachometer-alt"></i>Dashboard</a></li>
             <li class="nav-item"><a href="usermanagement.php" class="nav-link"><i class="fas fa-users"></i>User Management</a></li>
             <li class="nav-item"><a href="employeemanagement.php" class="nav-link"><i class="fas fa-user-tie"></i>Employee Management</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-box"></i>Categories & Products</a></li>
+            <li class="nav-item"><a href="categorymanagement.php" class="nav-link"><i class="fas fa-box"></i>Categories & Products</a></li>
             <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-truck"></i>Pickup Requests</a></li>
             <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-recycle"></i>E-Waste Collection</a></li>
             <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-chart-line"></i>Reports & Analytics</a></li>
@@ -237,15 +262,18 @@ $fullname = $_SESSION['fullname'];
     </div>
 
     <div class="main-content">
+        
         <div class="header">
-            <h1>Dashboard Overview</h1>
+            <h1>
+                <img src="logo.png" alt="JunkGenie Logo">
+                JunkGenie Dashboard
+            </h1>
             <div class="profile-dropdown">
-                <button class="btn btn-primary">Admin Profile</button>
-                <p><?php echo htmlspecialchars($fullname); ?></p>
+                <button class="btn btn-primary"><?php echo htmlspecialchars($fullname); ?></button>
                 <div class="profile-dropdown-content">
                     <a href="#">Profile</a>
                     <a href="#">Settings</a>
-                    <a href="#">Logout</a>
+                    <a href="logout.php">Logout</a>
                 </div>
             </div>
         </div>
