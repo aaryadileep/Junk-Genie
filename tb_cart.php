@@ -4,10 +4,8 @@ require_once 'connect.php';
 $sql = "CREATE TABLE IF NOT EXISTS cart (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    pickup_address VARCHAR(255) NOT NULL,
     pickup_date DATE NOT NULL,
-    pickup_time TIME NOT NULL CHECK (pickup_time BETWEEN '09:00:00' AND '17:00:00'),
-    pickup_status ENUM('Pending', 'Accepted', 'Rejected', 'Picked Up') DEFAULT 'Pending',
+    pickup_status ENUM('Pending', 'Accepted', 'Rejected', 'Picked Up','Cancelled') DEFAULT 'Pending',
     assigned_employee_id INT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,

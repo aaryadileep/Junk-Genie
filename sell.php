@@ -2,7 +2,7 @@
 session_start();
 require_once 'connect.php';
 
-// Fetch categories and products
+// Fetch categories, products, and user addresses
 $categories = $conn->query("SELECT * FROM category WHERE is_active = 1");
 $products = $conn->query("SELECT * FROM products WHERE is_active = 1");
 
@@ -13,10 +13,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     
     $user_id = $_SESSION['user_id'];
-    $pickup_date = $_POST['pickup_date']; // Get pickup date from the form
-    
+    $pickup_date = $_POST['pickup_date'];
+
     // Create a new cart entry
-    $stmt = $conn->prepare("INSERT INTO cart (user_id, pickup_address, pickup_date, pickup_time) VALUES (?, '', ?, CURTIME())");
+    $stmt = $conn->prepare("INSERT INTO cart (user_id, pickup_date) VALUES (?, ?)");
     $stmt->bind_param("is", $user_id, $pickup_date);
     $stmt->execute();
     $cart_id = $conn->insert_id;
@@ -41,17 +41,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->execute();
     }
 
-    echo "<script>
-            Swal.fire({
-                title: 'Success!',
-                text: 'Items added to cart',
-                icon: 'success',
-                showConfirmButton: false,
-                timer: 1500
-            }).then(() => {
-                window.location.href='cart.php';
-            });
-          </script>";
+    // Redirect to confirm_pickup.php with cart_id
+    header("Location: confirm_pickup.php?cart_id=" . $cart_id);
+    exit();
 }
 ?>
 
@@ -77,8 +69,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             background: white;
             border-radius: 15px;
             padding: 30px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 15px rgb(18, 244, 135);
             margin-bottom: 20px;
+            margin-top:75px;
         }
         .item {
             background: #f8f9fa;
@@ -172,7 +165,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="container">
         <div class="sell-card">
             <h2 class="mb-4">Sell Your E-Waste</h2>
-            <form action="" method="POST" enctype="multipart/form-data">
+            <form action="sell.php" method="POST" enctype="multipart/form-data">
                 <div id="items-container">
                     <div class="item">
                         <div class="row">

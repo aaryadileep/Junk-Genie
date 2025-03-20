@@ -1,32 +1,35 @@
 <?php
 session_start();
-include 'connect.php'; // Database connection
 
-$user_id = $_SESSION['user_id'] ?? 1; // Replace with actual user ID logic
-
-// Fetch cart items
-$cartQuery = "SELECT * FROM cart WHERE user_id = '$user_id'";
-$cartResult = mysqli_query($conn, $cartQuery);
-
-// Prepare order details
-$orderDetails = [];
-while ($row = mysqli_fetch_assoc($cartResult)) {
-    $orderDetails[] = $row;
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
 }
 
-// Insert into orders table
-$orderDetailsJson = json_encode($orderDetails);
-$addressQuery = "SELECT address FROM users WHERE user_id = '$user_id'";
-$addressResult = mysqli_query($conn, $addressQuery);
-$address = mysqli_fetch_assoc($addressResult)['address'] ?? 'Address not specified';
-
-$query = "INSERT INTO orders (user_id, order_details, address) 
-          VALUES ('$user_id', '$orderDetailsJson', '$address')";
-if (mysqli_query($conn, $query)) {
-    // Clear the cart
-    mysqli_query($conn, "DELETE FROM cart WHERE user_id = '$user_id'");
-    echo json_encode(['success' => true]);
-} else {
-    echo json_encode(['success' => false, 'message' => 'Failed to confirm order']);
+// Display success message if set
+if (isset($_SESSION['success_message'])) {
+    echo "<script>alert('" . $_SESSION['success_message'] . "');</script>";
+    unset($_SESSION['success_message']); // Clear the message after displaying
 }
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard | JunkGenie</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <?php include 'navbar.php'; ?>
+
+    <div class="container mt-5">
+        <h1>Welcome to Your Dashboard</h1>
+        <p>This is your user dashboard. You can manage your account and view your orders here.</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
