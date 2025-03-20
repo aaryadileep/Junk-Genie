@@ -20,7 +20,7 @@ $userStmt->bind_param("i", $user_id);
 $userStmt->execute();
 $user = $userStmt->get_result()->fetch_assoc();
 
-// Add a new query to fetch user addresses
+// Fetch user addresses
 $addressStmt = $conn->prepare("SELECT * FROM user_addresses WHERE user_id = ? AND is_active = 1");
 $addressStmt->bind_param("i", $user_id);
 $addressStmt->execute();
@@ -42,15 +42,32 @@ if (!$user) {
 }
 
 // Fetch cart details with items
-$cartStmt = $conn->prepare("SELECT c.*, ci.*, p.product_name, cat.category_name 
+$cartStmt = $conn->prepare("SELECT c.*, ci.*, p.product_name, cat.category_name, 
+                           ua.address_line, ua.landmark, ua.pincode, ua.address_type
                            FROM cart c
                            JOIN cart_items ci ON c.id = ci.cart_id
                            JOIN products p ON ci.product_id = p.product_id
                            JOIN category cat ON p.category_id = cat.category_id
+                           JOIN user_addresses ua ON c.address_id = ua.address_id
                            WHERE c.id = ? AND c.user_id = ?");
 $cartStmt->bind_param("ii", $cart_id, $user_id);
 $cartStmt->execute();
 $cart_items = $cartStmt->get_result();
+
+if ($cart_items->num_rows === 0) {
+    echo "<script>
+            Swal.fire({
+                title: 'Error!',
+                text: 'Cart not found or you do not have access to it',
+                icon: 'error',
+                showConfirmButton: false,
+                timer: 1500
+            }).then(() => {
+                window.location.href='sell.php';
+            });
+          </script>";
+    exit();
+}
 
 // Fetch categories and products for edit form
 $categories = $conn->query("SELECT * FROM category WHERE is_active = 1");
@@ -87,118 +104,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_item'])) {
 
 // Handle pickup confirmation
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_pickup'])) {
-    if (empty($_POST['pickup_address_id'])) {
+    try {
+        $conn->begin_transaction();
+
+        // Update cart status to confirmed
+        $updateCartStmt = $conn->prepare("UPDATE cart 
+            SET pickup_status = 'Confirmed'
+            WHERE id = ? AND user_id = ?");
+        
+        $updateCartStmt->bind_param("ii", $cart_id, $user_id);
+
+        if (!$updateCartStmt->execute()) {
+            throw new Exception("Failed to update cart status");
+        }
+
+        $conn->commit();
+        
+        // Direct header redirect instead of using JavaScript
+        header("Location: order_details.php?cart_id=" . $cart_id);
+        exit();
+
+    } catch (Exception $e) {
+        $conn->rollback();
         echo "<script>
                 Swal.fire({
                     title: 'Error!',
-                    text: 'Please select a pickup address',
+                    text: 'Failed to confirm order: " . $e->getMessage() . "',
                     icon: 'error',
                     showConfirmButton: true
                 });
               </script>";
-    } else {
-        $pickup_address_id = $_POST['pickup_address_id'];
-        
-        try {
-            $conn->begin_transaction();
-
-            // Get city_id and address details
-            $cityStmt = $conn->prepare("SELECT ua.*, c.city_name 
-                                       FROM user_addresses ua 
-                                       JOIN cities c ON ua.city_id = c.city_id 
-                                       WHERE ua.address_id = ?");
-            $cityStmt->bind_param("i", $pickup_address_id);
-            $cityStmt->execute();
-            $addressData = $cityStmt->get_result()->fetch_assoc();
-            
-            if (!$addressData) {
-                throw new Exception("Invalid address selected");
-            }
-
-            // Combine address details
-            $fullAddress = $addressData['address_line'];
-            if (!empty($addressData['landmark'])) {
-                $fullAddress .= ", " . $addressData['landmark'];
-            }
-            $fullAddress .= " - " . $addressData['pincode'];
-
-            // Get cart details including pickup date
-            $cartStmt = $conn->prepare("SELECT pickup_date FROM cart WHERE id = ?");
-            $cartStmt->bind_param("i", $cart_id);
-            $cartStmt->execute();
-            $cartData = $cartStmt->get_result()->fetch_assoc();
-
-            // Count total items in cart
-            $itemCountStmt = $conn->prepare("SELECT COUNT(*) as total FROM cart_items WHERE cart_id = ?");
-            $itemCountStmt->bind_param("i", $cart_id);
-            $itemCountStmt->execute();
-            $totalItems = $itemCountStmt->get_result()->fetch_assoc()['total'];
-
-            // Insert into order_history
-            $insertOrderStmt = $conn->prepare("INSERT INTO order_history 
-                (user_id, cart_id, pickup_date, pickup_address, city_id, total_items, order_status) 
-                VALUES (?, ?, ?, ?, ?, ?, 'Confirmed')");
-            
-            $insertOrderStmt->bind_param("iissis", 
-                $user_id, 
-                $cart_id, 
-                $cartData['pickup_date'],
-                $fullAddress,
-                $addressData['city_id'],
-                $totalItems
-            );
-
-            if (!$insertOrderStmt->execute()) {
-                throw new Exception("Failed to create order history");
-            }
-
-            // Update cart status
-            $updateCartStmt = $conn->prepare("UPDATE cart 
-                SET pickup_status = 'Confirmed', 
-                    pickup_address_id = ?,
-                    city_id = ?,
-                    pickup_address = ?
-                WHERE id = ?");
-            $updateCartStmt->bind_param("iisi", 
-                $pickup_address_id, 
-                $addressData['city_id'],
-                $fullAddress,
-                $cart_id
-            );
-
-            if (!$updateCartStmt->execute()) {
-                throw new Exception("Failed to update cart status");
-            }
-
-            $conn->commit();
-            
-            echo "<script>
-                    Swal.fire({
-                        title: 'Success!',
-                        text: 'Pickup confirmed successfully',
-                        icon: 'success',
-                        showConfirmButton: false,
-                        timer: 1500
-                    }).then(() => {
-                        window.location.href = 'order_history.php';
-                    });
-                  </script>";
-
-        } catch (Exception $e) {
-            $conn->rollback();
-            echo "<script>
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'Failed to confirm pickup: " . $e->getMessage() . "',
-                        icon: 'error',
-                        showConfirmButton: true
-                    });
-                  </script>";
-        }
     }
 }
 ?>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -279,7 +219,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_pickup'])) {
         }
     </style>
 </head>
-
 <body>
     <?php include 'navbar.php'; ?>
 
@@ -421,9 +360,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_pickup'])) {
                     <?php endwhile; ?>
 
                     <div class="text-end mt-4">
-                        <a href="order_history.php" class="btn btn-success">
-                            <i class="fas fa-check"></i> Confirm Pickup
-                        </a>
+                        <form method="POST" action="">
+                            <button type="submit" name="confirm_pickup" class="btn btn-success">
+                                <i class="fas fa-check"></i> Done
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>

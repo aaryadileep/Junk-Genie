@@ -156,7 +156,7 @@ $city = $_SESSION['city'];
                         <img src="images/profile.jpg" alt="Profile" class="user-avatar" data-bs-toggle="dropdown">
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user me-2"></i>Profile</a></li>
-                            <li><a class="dropdown-item" href="orders.php"><i class="fas fa-box me-2"></i>My Orders</a></li>
+                            <li><a class="dropdown-item" href="order_history.php"><i class="fas fa-box me-2"></i>My Orders</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                         </ul>

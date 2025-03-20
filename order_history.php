@@ -9,21 +9,22 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Fetch order history
-$orderStmt = $conn->prepare("
-    SELECT oh.*, c.city_name,
-           GROUP_CONCAT(CONCAT(p.product_name, ' (', ci.description, ')') SEPARATOR '<br>') as items
-    FROM cart oh
-    JOIN cities c ON oh.city_id = c.city_id
-    JOIN cart_items ci ON oh.cart_id = ci.cart_id
-    JOIN products p ON ci.product_id = p.product_id
-    WHERE oh.user_id = ?
-    GROUP BY oh.order_id
-    ORDER BY oh.created_at DESC
+// Fetch orders with cart details
+$stmt = $conn->prepare("
+    SELECT c.id as cart_id, 
+           c.pickup_date,
+           c.pickup_status,
+           c.created_at,
+           COUNT(ci.id) as total_items
+    FROM cart c
+    LEFT JOIN cart_items ci ON c.id = ci.cart_id
+    WHERE c.user_id = ?
+    GROUP BY c.id
+    ORDER BY c.created_at DESC
 ");
-$orderStmt->bind_param("i", $user_id);
-$orderStmt->execute();
-$orders = $orderStmt->get_result();
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$orders = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -39,51 +40,65 @@ $orders = $orderStmt->get_result();
             background-color: #f8f9fa;
             padding-top: 20px;
         }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        .card-header {
-            background-color: #007bff;
-            color: white;
-            border-radius: 15px 15px 0 0;
-            padding: 20px;
-            text-align: center;
-        }
-        .card-body {
-            padding: 30px;
-        }
-        .order-card {
+        .order-box {
             background: white;
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             transition: transform 0.2s;
         }
-        .order-card:hover {
+        .order-box:hover {
             transform: translateY(-5px);
         }
+        .order-id {
+            color: #4CAF50;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
         .status-badge {
-            padding: 5px 15px;
+            padding: 8px 15px;
             border-radius: 20px;
             font-size: 0.9rem;
+            font-weight: 500;
         }
-        .status-Pending { background-color: #ffd700; }
-        .status-Confirmed { background-color: #87ceeb; }
-        .status-Picked { background-color: #98fb98; }
-        .status-Completed { background-color: #90ee90; }
-        .status-Cancelled { background-color: #ff6b6b; }
-        .no-orders {
+        .status-Pending {
+            background-color: #ffd700;
+            color: #000;
+        }
+        .status-Confirmed {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .status-Cancelled {
+            background-color: #ff6b6b;
+            color: white;
+        }
+        .status-Completed {
+            background-color: #2196F3;
+            color: white;
+        }
+        .btn-open {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .btn-open:hover {
+            background-color: #45a049;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .empty-state {
             text-align: center;
-            color: #6c757d;
-            padding: 50px 0;
+            padding: 50px 20px;
+        }
+        .empty-state i {
+            font-size: 4rem;
+            color: #ccc;
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -91,89 +106,57 @@ $orders = $orderStmt->get_result();
     <?php include 'navbar.php'; ?>
 
     <div class="container py-5">
-        <h2 class="mb-4">My Pickup History</h2>
+        <h2 class="mb-4">My Orders</h2>
 
         <?php if ($orders->num_rows > 0): ?>
-            <?php while ($order = $orders->fetch_assoc()): ?>
-                <div class="order-card">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <h5>Order #<?= $order['order_id'] ?></h5>
-                            <p class="text-muted mb-2">
-                                Placed on: <?= date('F j, Y', strtotime($order['created_at'])) ?>
-                            </p>
-                            <p><strong>Pickup Date:</strong> <?= date('F j, Y', strtotime($order['pickup_date'])) ?></p>
-                            <p><strong>Address:</strong> <?= htmlspecialchars($order['pickup_address']) ?></p>
-                            <p><strong>City:</strong> <?= htmlspecialchars($order['city_name']) ?></p>
-                            <div class="mt-3">
-                                <strong>Items:</strong><br>
-                                <?= $order['items'] ?>
+            <div class="row">
+                <?php while ($order = $orders->fetch_assoc()): ?>
+                    <div class="col-md-6 mb-4">
+                        <div class="order-box">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="order-id">Order #OI<?= $order['cart_id'] ?></span>
+                                <span class="status-badge status-<?= $order['pickup_status'] ?>">
+                                    <?= $order['pickup_status'] ?>
+                                </span>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <p class="mb-2">
+                                    <i class="fas fa-calendar-alt me-2"></i>
+                                    Pickup Date: <?= date('d M Y', strtotime($order['pickup_date'])) ?>
+                                </p>
+                                <p class="mb-2">
+                                    <i class="fas fa-box me-2"></i>
+                                    Items: <?= $order['total_items'] ?>
+                                </p>
+                                <p class="mb-0">
+                                    <i class="fas fa-clock me-2"></i>
+                                    Ordered on: <?= date('d M Y, h:i A', strtotime($order['created_at'])) ?>
+                                </p>
+                            </div>
+
+                            <div class="text-end">
+                                <a href="order_details.php?cart_id=<?= $order['cart_id'] ?>" 
+                                   class="btn-open">
+                                    <i class="fas fa-external-link-alt me-2"></i>Open
+                                </a>
                             </div>
                         </div>
-                        <div class="col-md-4 text-end">
-                            <span class="status-badge status-<?= $order['order_status'] ?>">
-                                <?= $order['order_status'] ?>
-                            </span>
-                            <p class="mt-3">
-                                <strong>Total Items:</strong> <?= $order['total_items'] ?>
-                            </p>
-                            <?php if ($order['order_status'] == 'Pending'): ?>
-                                <button class="btn btn-danger btn-sm mt-2" 
-                                        onclick="cancelOrder(<?= $order['order_id'] ?>)">
-                                    Cancel Order
-                                </button>
-                            <?php endif; ?>
-                        </div>
                     </div>
-                </div>
-            <?php endwhile; ?>
+                <?php endwhile; ?>
+            </div>
         <?php else: ?>
-            <div class="text-center py-5">
-                <i class="fas fa-box-open fa-3x mb-3 text-muted"></i>
-                <h4>No orders yet</h4>
+            <div class="empty-state">
+                <i class="fas fa-box-open"></i>
+                <h3>No Orders Yet</h3>
                 <p class="text-muted">Start selling your e-waste today!</p>
-                <a href="sell.php" class="btn btn-success">Sell Now</a>
+                <a href="sell.php" class="btn btn-success mt-3">
+                    <i class="fas fa-plus me-2"></i>Sell Now
+                </a>
             </div>
         <?php endif; ?>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        function cancelOrder(orderId) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, cancel it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Add AJAX call to cancel order
-                    fetch('cancel_order.php?order_id=' + orderId)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire(
-                                    'Cancelled!',
-                                    'Your order has been cancelled.',
-                                    'success'
-                                ).then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire(
-                                    'Error!',
-                                    'Failed to cancel order.',
-                                    'error'
-                                );
-                            }
-                        });
-                }
-            });
-        }
-    </script>
 </body>
-</html>
+</html> 
