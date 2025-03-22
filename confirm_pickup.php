@@ -107,18 +107,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_pickup'])) {
     try {
         $conn->begin_transaction();
 
-        // Update cart status to confirmed
-        $updateCartStmt = $conn->prepare("UPDATE cart 
-            SET pickup_status = 'Confirmed'
-            WHERE id = ? AND user_id = ?");
         
-        $updateCartStmt->bind_param("ii", $cart_id, $user_id);
-
-        if (!$updateCartStmt->execute()) {
-            throw new Exception("Failed to update cart status");
-        }
-
-        $conn->commit();
+        
+        
+       
         
         // Direct header redirect instead of using JavaScript
         header("Location: order_details.php?cart_id=" . $cart_id);

@@ -253,7 +253,7 @@ $fullname = $_SESSION['fullname'];
             <li class="nav-item"><a href="usermanagement.php" class="nav-link"><i class="fas fa-users"></i>User Management</a></li>
             <li class="nav-item"><a href="employeemanagement.php" class="nav-link"><i class="fas fa-user-tie"></i>Employee Management</a></li>
             <li class="nav-item"><a href="categorymanagement.php" class="nav-link"><i class="fas fa-box"></i>Categories & Products</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-truck"></i>Pickup Requests</a></li>
+            <li class="nav-item"><a href="pickuprequests.php" class="nav-link"><i class="fas fa-truck"></i>Pickup Requests</a></li>
             <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-recycle"></i>E-Waste Collection</a></li>
             <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-chart-line"></i>Reports & Analytics</a></li>
             <li class="nav-item"><a href="citymanagement.php" class="nav-link"><i class="fas fa-city"></i>City Management</a></li>

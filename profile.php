@@ -293,7 +293,7 @@ $stmt->close();
                     </button>
                 </div>
                 <div class="col-6">
-                    <button class="btn btn-light w-100 profile-action-btn" onclick="window.location.href='orders.php'">
+                    <button class="btn btn-light w-100 profile-action-btn" onclick="window.location.href='order_history.php'">
                         <i class="fas fa-shopping-bag text-success me-2"></i>
                         <span>My Orders</span>
                     </button>

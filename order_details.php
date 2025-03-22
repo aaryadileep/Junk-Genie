@@ -2,6 +2,7 @@
 session_start();
 require_once 'connect.php';
 
+// Redirect if user is not logged in or cart_id is not provided
 if (!isset($_SESSION['user_id']) || !isset($_GET['cart_id'])) {
     header("Location: login.php");
     exit();
@@ -10,7 +11,7 @@ if (!isset($_SESSION['user_id']) || !isset($_GET['cart_id'])) {
 $user_id = $_SESSION['user_id'];
 $cart_id = $_GET['cart_id'];
 
-// Update the query to use the correct column name
+// Fetch order details
 $stmt = $conn->prepare("
     SELECT c.*, 
            ci.image, ci.description,
@@ -30,6 +31,7 @@ $stmt->bind_param("ii", $cart_id, $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
+// Redirect if no order is found
 if ($result->num_rows === 0) {
     header("Location: order_history.php");
     exit();
@@ -93,30 +95,11 @@ $order_details = $result->fetch_assoc();
             background-color: #4CAF50;
             color: white;
         }
-        .status-badge.status-Cancelled,
-        .status-badge.status-Rejected {
+        .status-badge.status-Rejected,
+        .status-badge.status-Cancelled {
             background-color: #ff5252;
             color: white;
         }
-
-        .order-card {
-            border: 2px solid;
-            transition: all 0.3s ease;
-        }
-        .order-card.status-Pending {
-            border-color: #ffd700;
-        }
-        .order-card.status-Confirmed {
-            border-color: #ff9800;
-        }
-        .order-card.status-Completed {
-            border-color: #4CAF50;
-        }
-        .order-card.status-Cancelled,
-        .order-card.status-Rejected {
-            border-color: #ff5252;
-        }
-
         .btn-cancel {
             background-color: #ff5252;
             color: white;
@@ -134,22 +117,13 @@ $order_details = $result->fetch_assoc();
 <body>
     <?php include 'navbar.php'; ?>
 
-    <div class="container py-5">
+    <div class="container">
         <div class="details-card">
             <div class="order-header">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h3>Order #OI<?= $cart_id ?></h3>
-                    <div>
-                        <span class="status-badge status-<?= $order_details['pickup_status'] ?> me-3">
-                            <?= $order_details['pickup_status'] ?>
-                        </span>
-                        <?php if ($order_details['pickup_status'] !== 'Cancelled' && $order_details['pickup_status'] !== 'Completed'): ?>
-                            <button class="btn-cancel" onclick="cancelOrder(<?= $cart_id ?>)">
-                                <i class="fas fa-times me-2"></i>Cancel Order
-                            </button>
-                        <?php endif; ?>
-                    </div>
-                </div>
+                <h4>Order #<?= $cart_id ?></h4>
+                <span class="status-badge status-<?= $order_details['pickup_status'] ?>">
+                    <?= $order_details['pickup_status'] ?>
+                </span>
             </div>
 
             <div class="row mb-4">
@@ -196,6 +170,11 @@ $order_details = $result->fetch_assoc();
                 <a href="order_history.php" class="btn btn-secondary">
                     <i class="fas fa-arrow-left me-2"></i>Back to Orders
                 </a>
+                <?php if (in_array($order_details['pickup_status'], ['Pending', 'Confirmed'])): ?>
+                    <button onclick="cancelOrder(<?= $cart_id ?>)" class="btn btn-cancel">
+                        <i class="fas fa-times me-2"></i>Cancel Order
+                    </button>
+                <?php endif; ?>
             </div>
         </div>
     </div>
