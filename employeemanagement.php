@@ -308,7 +308,7 @@ $result = $conn->query($query);
                         <th>Email</th>
                         <th>Phone</th>
                         <th>City</th>
-                        <th>Availability</th>
+                        <th>    </th>
                         <th>Status</th>
                         <th>Action</th>
                     </tr>
@@ -322,18 +322,7 @@ $result = $conn->query($query);
                         <td><?php echo htmlspecialchars($row['phone']); ?></td>
                         <td><?php echo htmlspecialchars($row['city_name'] ?? 'N/A'); ?></td>
                         <td>
-                            <select class="form-select form-select-sm" 
-                                    onchange="updateAvailability(<?php echo $row['employee_id']; ?>, this.value)">
-                                <option value="Available" <?php echo $row['availability'] == 'Available' ? 'selected' : ''; ?>>
-                                    Available
-                                </option>
-                                <option value="On Duty" <?php echo $row['availability'] == 'On Duty' ? 'selected' : ''; ?>>
-                                    On Duty
-                                </option>
-                                <option value="Off Duty" <?php echo $row['availability'] == 'Off Duty' ? 'selected' : ''; ?>>
-                                    Off Duty
-                                </option>
-                            </select>
+                           
                         </td>
                         <td>
                             <span class="status-badge <?php echo $row['is_active'] ? 'status-active' : 'status-inactive'; ?>">

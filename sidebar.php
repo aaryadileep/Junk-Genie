@@ -40,7 +40,7 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
             </a>
         </li>
         <li class="nav-item">
-            <a href="pickuprequests.php" class="nav-link <?php echo $current_page == 'pickuprequests' ? 'active' : ''; ?>">
+            <a href="pickuprequestmanagement.php" class="nav-link <?php echo $current_page == 'pickuprequests' ? 'active' : ''; ?>">
                 <i class="fas fa-truck"></i>
                 <span>Pickup Requests</span>
             </a>
