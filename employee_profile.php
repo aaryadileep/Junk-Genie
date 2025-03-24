@@ -13,8 +13,7 @@ $user_id = $_SESSION['user_id'];
 $query = "SELECT u.*, e.employee_id, e.Availability, c.city_name
           FROM users u 
           JOIN employees e ON u.user_id = e.user_id
-          LEFT JOIN user_addresses ua ON u.user_id = ua.user_id AND ua.is_default = 1
-          LEFT JOIN cities c ON ua.city_id = c.city_id
+          LEFT JOIN cities c ON u.city_id = c.city_id
           WHERE u.user_id = ?";
 
 $stmt = $conn->prepare($query);
@@ -23,39 +22,6 @@ $stmt->execute();
 $result = $stmt->get_result();
 $employee = $result->fetch_assoc();
 
-// In the PHP section, add this function to calculate days remaining
-function getDaysRemaining($pickup_date) {
-    $today = new DateTime();
-    $pickup = new DateTime($pickup_date);
-    $interval = $today->diff($pickup);
-    $days = $interval->days;
-    
-    if ($today > $pickup) {
-        return ['text' => 'Overdue', 'class' => 'text-danger'];
-    } elseif ($days == 0) {
-        return ['text' => 'Today', 'class' => 'text-warning'];
-    } elseif ($days == 1) {
-        return ['text' => 'Tomorrow', 'class' => 'text-success'];
-    } else {
-        return ['text' => $days . ' days left', 'class' => 'text-success'];
-    }
-}
-
-function getPickupCountdown($pickup_date) {
-    $pickup = new DateTime($pickup_date);
-    $today = new DateTime();
-    $interval = $today->diff($pickup);
-    
-    if ($today > $pickup) {
-        return '<span class="countdown overdue"><i class="fas fa-exclamation-circle"></i> Overdue</span>';
-    } elseif ($interval->days == 0) {
-        return '<span class="countdown today"><i class="fas fa-clock"></i> Today</span>';
-    } elseif ($interval->days == 1) {
-        return '<span class="countdown tomorrow"><i class="fas fa-clock"></i> Tomorrow</span>';
-    } else {
-        return '<span class="countdown upcoming"><i class="fas fa-calendar"></i> ' . $interval->days . ' days left</span>';
-    }
-}
 ?>
 
 <!DOCTYPE html>

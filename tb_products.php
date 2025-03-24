@@ -6,7 +6,7 @@ $sql = "CREATE TABLE IF NOT EXISTS products (
     category_id INT NOT NULL,
     product_name VARCHAR(100) NOT NULL,
     description varchar(255),
-    price_per_kg DECIMAL(10,2) NOT NULL,
+    price_per_pc DECIMAL(10,2) NOT NULL,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

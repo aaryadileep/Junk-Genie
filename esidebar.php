@@ -31,7 +31,7 @@ $user_data = $user_result->fetch_assoc();
             <i class="fas fa-map-marker-alt"></i>
             <span>Track Pickups</span>
         </a>
-        <a href="e_pickup_history.php" class="menu-item <?php echo basename($_SERVER['PHP_SELF']) == 'employee_pickup_history.php' ? 'active' : ''; ?>">
+        <a href="employee_pickup_history.php" class="menu-item <?php echo basename($_SERVER['PHP_SELF']) == 'employee_pickup_history.php' ? 'active' : ''; ?>">
             <i class="fas fa-history"></i>
             <span>Pickup History</span>
         </a>

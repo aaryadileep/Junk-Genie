@@ -403,7 +403,7 @@ $product_result = $conn->query($product_query);
                                         <span class="fw-medium"><?php echo htmlspecialchars($product_row['product_name']); ?></span>
                                     </td>
                                     <td><?php echo htmlspecialchars($product_row['description']); ?></td>
-                                    <td>₹<?php echo number_format($product_row['price_per_kg'], 2); ?></td>
+                                    <td>₹<?php echo number_format($product_row['price_per_pc'], 2); ?></td>
                                     <td><?php echo htmlspecialchars($product_row['category_name']); ?></td>
                                     <td>
                                         <span class="status-badge <?php echo $product_row['is_active'] ? 'status-active' : 'status-inactive'; ?>">

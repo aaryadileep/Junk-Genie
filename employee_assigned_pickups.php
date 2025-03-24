@@ -3,8 +3,8 @@ session_start();
 require_once 'connect.php';
 
 // Redirect if not logged in or not an employee
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'Employee') {
-    echo "<script>window.location.href = 'login.php';</script>";
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
     exit();
 }
 
@@ -31,7 +31,7 @@ $query = "SELECT c.id AS cart_id, c.pickup_date, c.pickup_status,
                  ci.image AS product_image, 
                  p.product_name,
                  cat.category_name,
-                 p.price_per_kg
+                 p.price_per_pc
           FROM cart c
           JOIN cart_items ci ON c.id = ci.cart_id
           JOIN products p ON ci.product_id = p.product_id
@@ -63,7 +63,7 @@ while ($row = $result->fetch_assoc()) {
         'product_description' => $row['product_description'],
         'product_image' => $row['product_image'],
         'category_name' => $row['category_name'],
-        'price_per_kg' => $row['price_per_kg']
+        'price_per_pc' => $row['price_per_pc']
     ];
 }
 
@@ -71,7 +71,6 @@ while ($row = $result->fetch_assoc()) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
         $cart_id = $_POST['cart_id'];
-        $employee_id = $_SESSION['user_id'];
 
         if ($_POST['action'] === 'accept') {
             // Update pickup_status to 'Accepted'
@@ -80,23 +79,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bind_param("i", $cart_id);
             $stmt->execute();
         } elseif ($_POST['action'] === 'reject') {
-            $reason = $_POST['reason'];
+            $reason = trim($_POST['reason']); // Remove whitespace from reason
 
-            // Update pickup_status to 'Rejected'
-            $update_query = "UPDATE cart SET pickup_status = 'Rejected' WHERE id = ?";
-            $stmt = $conn->prepare($update_query);
-            $stmt->bind_param("i", $cart_id);
-            $stmt->execute();
+            if (empty($reason)) {
+                // Optionally add error handling if reason is empty
+                $_SESSION['error'] = "Please provide a reason for rejection.";
+            } else {
+                // Update pickup_status to 'Rejected'
+                $update_query = "UPDATE cart SET pickup_status = 'Rejected' WHERE id = ?";
+                $stmt = $conn->prepare($update_query);
+                $stmt->bind_param("i", $cart_id);
+                $stmt->execute();
 
-            // Insert rejection reason into rejections table
-            $insert_query = "INSERT INTO rejections (cart_id, employee_id, reason) VALUES (?, ?, ?)";
-            $stmt = $conn->prepare($insert_query);
-            $stmt->bind_param("iis", $cart_id, $employee_id, $reason);
-            $stmt->execute();
+                // Insert rejection reason into rejections table
+                $insert_query = "INSERT INTO rejections (cart_id, reason) VALUES (?, ?)";
+                $stmt = $conn->prepare($insert_query);
+                $stmt->bind_param("is", $cart_id, $reason); // "is" for integer (cart_id) and string (reason)
+                $stmt->execute();
+            }
         }
 
         // Refresh the page to reflect changes
-        echo "<script>window.location.href = 'employee_assigned_pickups.php';</script>";
+        header("Location: employee_assigned_pickups.php");
         exit();
     }
 }
@@ -111,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-         :root {
+       :root {
             --primary-green: #2E7D32;
             --light-green: #4CAF50;
             --sidebar-width: 250px;
@@ -200,7 +204,87 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             min-height: 100vh;
         }
 
-        .pickup-card {
+        .profile-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+            border: 3px solid var(--primary-green);
+            padding: 3px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-available {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .status-unavailable {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+
+        .info-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .edit-button {
+            background-color: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .edit-button:hover {
+            background-color: var(--light-green);
+            transform: translateY(-2px);
+        }
+
+        /* Modal styles */
+        .modal-header {
+            background-color: var(--primary-green);
+            color: white;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .dashboard-card {
             background: white;
             border-radius: 15px;
             padding: 1.5rem;
@@ -209,36 +293,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             transition: transform 0.3s ease;
         }
 
-        .pickup-card:hover {
+        .dashboard-card:hover {
             transform: translateY(-5px);
         }
 
-        .pickup-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .stats-icon {
+            font-size: 2rem;
             margin-bottom: 1rem;
         }
-
-        .pickup-id {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--primary-green);
-        }
-
-        .pickup-date {
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .product-list {
-            margin-top: 1rem;
-        }
-
-        .product-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
+        .pickup-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
         }
 
         .product-image {
@@ -247,39 +315,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             object-fit: cover;
             border-radius: 10px;
             margin-right: 1rem;
-        }
-
-        .product-details {
-            flex: 1;
-        }
-
-        .product-name {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .product-category {
-            font-size: 0.875rem;
-            color: #666;
-        }
-
-        .product-description {
-            font-size: 0.875rem;
-            color: #666;
-            margin-top: 0.25rem;
-        }
-
-        .product-price {
-            font-size: 0.875rem;
-            color: #666;
-            margin-top: 0.25rem;
-        }
-
-        .item-count {
-            font-size: 0.875rem;
-            color: #666;
-            margin-top: 0.5rem;
         }
     </style>
 </head>
@@ -307,7 +342,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <div class="product-name"><?php echo htmlspecialchars($product['product_name']); ?></div>
                                     <div class="product-category">Category: <?php echo htmlspecialchars($product['category_name']); ?></div>
                                     <div class="product-description"><?php echo htmlspecialchars($product['product_description']); ?></div>
-                                    <div class="product-price">Price: ₹<?php echo htmlspecialchars($product['price_per_kg']); ?> per kg</div>
+                                    <div class="product-price">Price: ₹<?php echo htmlspecialchars($product['price_per_pc']); ?> per kg</div>
                                 </div>
                             </div>
                         <?php endforeach; ?>

@@ -68,284 +68,170 @@ if (!$result) {
             --text-color: #333;
         }
 
+        <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #388E3C;
+            --primary-light: #C8E6C9;
+            --secondary: #F5F5F5;
+            --success: #4CAF50;
+            --danger: #f44336;
+            --warning: #ff9800;
+            --info: #2196f3;
+        }
+
         body {
-            display: flex;
-            background-color: var(--background-color);
+            background: #f5f6fa;
+            min-height: 100vh;
         }
 
-        /* Sidebar Styles */
-        .sidebar {
-            width: 250px;
-            height: 100vh;
-            background-color: var(--primary-color);
-            padding: 20px;
-            position: fixed;
-            left: 0;
-            top: 0;
-            overflow-y: auto;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .logo {
-            color: white;
-            font-size: 24px;
-            margin-bottom: 30px;
-            text-align: center;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .logo img {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
-        }
-
-        .nav-menu {
-            list-style: none;
-        }
-
-        .nav-item {
-            margin-bottom: 10px;
-        }
-
-        .nav-link {
-            color: #fff;
-            text-decoration: none;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            border-radius: 5px;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
-        .nav-link:hover {
-            background-color: var(--secondary-color);
-            transform: translateX(5px);
-        }
-
-        .nav-link i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-
-        /* Main Content Styles */
         .main-content {
-            margin-left: 250px;
+            margin-left: 280px;
             padding: 20px;
-            width: calc(100% - 250px);
         }
 
         .header {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            background-color: white;
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        .header h1 {
-            color: var(--primary-color);
-            font-size: 24px;
-            display: flex;
-            align-items: center;
-        }
 
         .header h1 img {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
-        }
+        width: 40px;
+        height: 40px;
+        margin-right: 10px;
+    }
 
-        .profile-dropdown {
-            position: relative;
-            display: inline-block;
-        }
+    .profile-dropdown {
+        position: relative;
+        display: inline-block;
+    }
 
-        .profile-dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            background-color: white;
-            min-width: 150px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            z-index: 1;
-            border-radius: 5px;
-            overflow: hidden;
-        }
+    .profile-dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        background-color: white;
+        min-width: 150px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        z-index: 1;
+        border-radius: 5px;
+        overflow: hidden;
+    }
 
-        .profile-dropdown-content a {
-            color: var(--primary-color);
-            padding: 10px;
-            text-decoration: none;
-            display: block;
-            transition: background-color 0.3s;
-        }
+    .profile-dropdown-content a {
+        color: var(--primary);
+        padding: 10px;
+        text-decoration: none;
+        display: block;
+        transition: background-color 0.3s;
+    }
 
-        .profile-dropdown-content a:hover {
-            background-color: var(--secondary-color);
-            color: white;
-        }
+    .profile-dropdown-content a:hover {
+        background-color: var(--primary-light);
+        color: var(--primary-dark);
+    }
 
-        .profile-dropdown:hover .profile-dropdown-content {
-            display: block;
-        }
+    .profile-dropdown:hover .profile-dropdown-content {
+        display: block;
+    }
 
-        .dashboard-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
+    .table-container {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    }
 
-        .card {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
+    .status-active {
+        background: rgba(76, 175, 80, 0.1);
+        color: #4CAF50;
+    }
 
-        .card-title {
-            font-size: 16px;
-            color: var(--secondary-color);
-            margin-bottom: 10px;
-        }
+    .status-inactive {
+        background: rgba(244, 67, 54, 0.1);
+        color: #F44336;
+    }
 
-        .card-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
+    .toggle-btn {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: all 0.3s ease;
+    }
 
-        .chart-container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
+    .toggle-activate {
+        background: rgba(76, 175, 80, 0.1);
+        color: #4CAF50;
+    }
 
-        .btn {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background-color 0.3s;
-        }
+    .toggle-deactivate {
+        background: rgba(244, 67, 54, 0.1);
+        color: #F44336;
+    }
 
-        .btn-primary {
-            background-color: var(--accent-color);
-            color: white;
-        }
+    .toggle-btn:hover {
+        opacity: 0.8;
+    }
 
-        .btn-primary:hover {
-            background-color: var(--secondary-color);
-        }
+    .dataTables_wrapper .dataTables_length select,
+    .dataTables_wrapper .dataTables_filter input {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 5px 10px;
+    }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-            }
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 5px 10px;
+        border-radius: 5px;
+        margin: 0 2px;
+        transition: background-color 0.3s;
+    }
 
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-            }
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background: var(--primary-light);
+        color: var(--primary-dark);
+    }
 
-            .dashboard-cards {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            }
-        }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: var(--primary);
+        color: white;
+    }
 
-        /* Additional styles for user management */
-        .table-container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
-
-        .status-badge {
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .status-active {
-            background: rgba(76, 175, 80, 0.1);
-            color: #4CAF50;
-        }
-
-        .status-inactive {
-            background: rgba(244, 67, 54, 0.1);
-            color: #F44336;
-        }
-
-        .toggle-btn {
-            padding: 5px 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.3s ease;
-        }
-
-        .toggle-activate {
-            background: rgba(76, 175, 80, 0.1);
-            color: #4CAF50;
-        }
-
-        .toggle-deactivate {
-            background: rgba(244, 67, 54, 0.1);
-            color: #F44336;
-        }
-
-        .dataTables_wrapper .dataTables_length select,
-        .dataTables_wrapper .dataTables_filter input {
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 5px 10px;
-        }
+    .dataTables_wrapper .dataTables_info {
+        color: #666;
+    }
     </style>
 </head>
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management | JunkGenie Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
 <body>
-<div class="sidebar">
-        <div class="logo">
-            <img src="logo.jpg" alt="JunkGenie Logo">
-            JunkGenie
-        </div>
-        <ul class="nav-menu">
-            <li class="nav-item"><a href="admindashboard.php" class="nav-link"><i class="fas fa-tachometer-alt"></i>Dashboard</a></li>
-            <li class="nav-item"><a href="usermanagement.php" class="nav-link"><i class="fas fa-users"></i>User Management</a></li>
-            <li class="nav-item"><a href="employeemanagement.php" class="nav-link"><i class="fas fa-user-tie"></i>Employee Management</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-box"></i>Categories & Products</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-truck"></i>Pickup Requests</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-recycle"></i>E-Waste Collection</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-chart-line"></i>Reports & Analytics</a></li>
-            <li class="nav-item"><a href="citymanagement.php" class="nav-link"><i class="fas fa-city"></i>City Management</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-cog"></i>Settings</a></li>
-        </ul>
-    </div>
-
-    
+    <?php include 'sidebar.php'; ?>
 
     <div class="main-content">
         <div class="header">

@@ -34,6 +34,12 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
             </a>
         </li>
         <li class="nav-item">
+            <a href="categorymanagement.php" class="nav-link <?php echo $current_page == 'categorymanagement' ? 'active' : ''; ?>">
+                <i class="fas fa-tags"></i>
+                <span>Category Management</span>
+            </a>
+        </li>
+        <li class="nav-item">
             <a href="citymanagement.php" class="nav-link <?php echo $current_page == 'citymanagement' ? 'active' : ''; ?>">
                 <i class="fas fa-city"></i>
                 <span>City Management</span>

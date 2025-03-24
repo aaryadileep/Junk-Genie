@@ -42,70 +42,11 @@ $fullname = $_SESSION['fullname'];
             background-color: var(--background-color);
         }
 
-        /* Sidebar Styles */
-        .sidebar {
-            width: 250px;
-            height: 100vh;
-            background-color: var(--primary-color);
-            padding: 20px;
-            position: fixed;
-            left: 0;
-            top: 0;
-            overflow-y: auto;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .logo {
-            color: white;
-            font-size: 24px;
-            margin-bottom: 30px;
-            text-align: center;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .logo img {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
-        }
-
-        .nav-menu {
-            list-style: none;
-        }
-
-        .nav-item {
-            margin-bottom: 10px;
-        }
-
-        .nav-link {
-            color: #fff;
-            text-decoration: none;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            border-radius: 5px;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
-        .nav-link:hover {
-            background-color: var(--secondary-color);
-            transform: translateX(5px);
-        }
-
-        .nav-link i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-
         /* Main Content Styles */
         .main-content {
-            margin-left: 250px;
+            margin-left: 280px; /* Match sidebar width from sidebar.php */
             padding: 20px;
-            width: calc(100% - 250px);
+            width: calc(100% - 280px);
         }
 
         .header {
@@ -225,12 +166,6 @@ $fullname = $_SESSION['fullname'];
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-            }
-
             .main-content {
                 margin-left: 0;
                 width: 100%;
@@ -243,26 +178,9 @@ $fullname = $_SESSION['fullname'];
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="logo">
-            <img src="logo.jpg" alt="JunkGenie Logo">
-            JunkGenie
-        </div>
-        <ul class="nav-menu">
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-tachometer-alt"></i>Dashboard</a></li>
-            <li class="nav-item"><a href="usermanagement.php" class="nav-link"><i class="fas fa-users"></i>User Management</a></li>
-            <li class="nav-item"><a href="employeemanagement.php" class="nav-link"><i class="fas fa-user-tie"></i>Employee Management</a></li>
-            <li class="nav-item"><a href="categorymanagement.php" class="nav-link"><i class="fas fa-box"></i>Categories & Products</a></li>
-            <li class="nav-item"><a href="pickuprequestmanagement.php" class="nav-link"><i class="fas fa-truck"></i>Pickup Requests</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-recycle"></i>E-Waste Collection</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-chart-line"></i>Reports & Analytics</a></li>
-            <li class="nav-item"><a href="citymanagement.php" class="nav-link"><i class="fas fa-city"></i>City Management</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-cog"></i>Settings</a></li>
-        </ul>
-    </div>
+    <?php include 'sidebar.php'; ?>
 
     <div class="main-content">
-        
         <div class="header">
             <h1>
                 <img src="logo.png" alt="JunkGenie Logo">
