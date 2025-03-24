@@ -53,10 +53,12 @@ $order_details = $result->fetch_assoc();
             background-color: #f8f9fa;
             padding-top: 20px;
         }
+       
         .details-card {
             background: white;
             border-radius: 15px;
             padding: 25px;
+            margin-top:60px;
             margin-bottom: 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }

@@ -385,7 +385,7 @@ $product_result = $conn->query($product_query);
                                     <th>ID</th>
                                     <th>Product Name</th>
                                     <th>Description</th>
-                                    <th>Price per Kg</th>
+                                    <th>Price per pc</th>
                                     <th>Category</th>
                                     <th>Status</th>
                                     <th>Created Date</th>

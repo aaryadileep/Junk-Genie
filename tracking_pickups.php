@@ -2,7 +2,24 @@
 session_start();
 require_once 'connect.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'Employee') {
+// Add this function at the top of your PHP section
+function getPickupCountdown($pickup_date) {
+    $pickup = new DateTime($pickup_date);
+    $today = new DateTime();
+    $interval = $today->diff($pickup);
+    
+    if ($today > $pickup) {
+        return '<span class="countdown overdue"><i class="fas fa-exclamation-circle"></i> Overdue</span>';
+    } elseif ($interval->days == 0) {
+        return '<span class="countdown today"><i class="fas fa-clock"></i> Today</span>';
+    } elseif ($interval->days == 1) {
+        return '<span class="countdown tomorrow"><i class="fas fa-clock"></i> Tomorrow</span>';
+    } else {
+        return '<span class="countdown upcoming"><i class="fas fa-calendar"></i> ' . $interval->days . ' days left</span>';
+    }
+}
+
+if (!isset($_SESSION['user_id'])) {
     echo "<script>window.location.href = 'login.php';</script>";
     exit();
 }
@@ -33,8 +50,7 @@ $pickup_query = "SELECT
     JOIN user_addresses ua ON c.address_id = ua.address_id
     JOIN cities ci ON ua.city_id = ci.city_id
     WHERE c.assigned_employee_id = ? 
-    AND c.pickup_status != 'Completed'
-    AND c.pickup_status != 'Rejected'
+    AND c.pickup_status IN ('Accepted')
     ORDER BY c.pickup_date ASC";
 
 $stmt = $conn->prepare($pickup_query);
@@ -51,6 +67,7 @@ $pickups = $stmt->get_result();
     <title>Track Pickups | JunkGenie</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         :root {
             --primary-green: #2E7D32;
@@ -159,6 +176,7 @@ $pickups = $stmt->get_result();
             border-radius: 20px;
             font-size: 0.875rem;
             font-weight: 500;
+            transition: all 0.3s ease;
         }
 
         .status-pending { background: #FFF3E0; color: #E65100; }
@@ -202,6 +220,128 @@ $pickups = $stmt->get_result();
             font-size: 0.875rem;
             margin-right: 0.5rem;
         }
+
+        .date-today {
+            color: orange;
+            font-weight: bold;
+        }
+
+        .date-passed {
+            color: red;
+            font-weight: bold;
+        }
+
+        .completion-checkbox {
+            position: relative;
+        }
+
+        .complete-checkbox {
+            display: none;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            border: 2px solid #2E7D32;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: transparent;
+        }
+
+        .checkbox-label:hover {
+            background-color: rgba(46, 125, 50, 0.1);
+        }
+
+        .complete-checkbox:checked + .checkbox-label {
+            background-color: #2E7D32;
+            color: white;
+        }
+
+        .success-animation {
+            font-size: 80px;
+            color: #2E7D32;
+            animation: scaleUp 0.5s ease;
+        }
+
+        @keyframes scaleUp {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        #successModal .modal-content {
+            border-radius: 15px;
+            border: none;
+        }
+
+        #successModal .btn-success {
+            border-radius: 25px;
+            padding: 10px 30px;
+        }
+
+        .countdown {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .countdown.overdue {
+            background-color: #FFE7E7;
+            color: #D32F2F;
+            border: 1px solid #FFCDD2;
+        }
+
+        .countdown.today {
+            background-color: #FFF3E0;
+            color: #E65100;
+            border: 1px solid #FFE0B2;
+        }
+
+        .countdown.tomorrow {
+            background-color: #E3F2FD;
+            color: #1565C0;
+            border: 1px solid #BBDEFB;
+        }
+
+        .countdown.upcoming {
+            background-color: #E8F5E9;
+            color: #2E7D32;
+            border: 1px solid #C8E6C9;
+        }
+
+        .countdown.completed {
+            background-color: #E8F5E9;
+            color: #2E7D32;
+            border: 1px solid #C8E6C9;
+        }
+
+        .fade-out {
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.5s ease;
+        }
+
+        .status-badge.status-completed {
+            background-color: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .status-badge.status-pending {
+            background-color: #FFF3E0;
+            color: #E65100;
+        }
+
+        .status-badge.status-in-progress {
+            background-color: #E3F2FD;
+            color: #1565C0;
+        }
     </style>
 </head>
 <body>
@@ -215,16 +355,39 @@ $pickups = $stmt->get_result();
 
         <?php if ($pickups->num_rows > 0): ?>
             <?php while ($pickup = $pickups->fetch_assoc()): ?>
-                <div class="tracking-card">
+                <div class="tracking-card" id="pickup-card-<?php echo $pickup['id']; ?>">
                     <div class="d-flex justify-content-between align-items-start mb-4">
-                        <div>
-                            <h4>Order #OI<?php echo $pickup['id']; ?></h4>
-                            <p class="text-muted mb-0">
-                                Scheduled for <?php echo date('F d, Y', strtotime($pickup['pickup_date'])); ?>
-                            </p>
+                        <div class="d-flex align-items-center">
+                            <?php if ($pickup['pickup_status'] != 'Completed'): ?>
+                                <div class="completion-checkbox me-3">
+                                    <input type="checkbox" 
+                                           id="complete_<?php echo $pickup['id']; ?>" 
+                                           class="complete-checkbox" 
+                                           onchange="completePickup(<?php echo $pickup['id']; ?>)">
+                                    <label for="complete_<?php echo $pickup['id']; ?>" 
+                                           class="checkbox-label">
+                                        <i class="fas fa-check"></i>
+                                    </label>
+                                </div>
+                            <?php endif; ?>
+                            <div>
+                                <h4>Order #OI<?php echo $pickup['id']; ?></h4>
+                                <p class="text-muted mb-0">
+                                    Scheduled for <?php echo date('F d, Y', strtotime($pickup['pickup_date'])); ?>
+                                </p>
+                                <div id="countdown-<?php echo $pickup['id']; ?>">
+                                    <?php if ($pickup['pickup_status'] != 'Completed'): ?>
+                                        <?php echo getPickupCountdown($pickup['pickup_date']); ?>
+                                    <?php else: ?>
+                                        <span class="countdown completed">
+                                            <i class="fas fa-check-circle"></i> Completed
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
                         </div>
-                        <span class="status-badge status-<?php echo strtolower($pickup['pickup_status']); ?>">
-                            <?php echo $pickup['pickup_status']; ?>
+                        <span class="status-badge status-<?php echo strtolower($pickup['pickup_status']); ?>" id="status-<?php echo $pickup['id']; ?>">
+                            <?php echo htmlspecialchars($pickup['pickup_status']); ?>
                         </span>
                     </div>
 
@@ -240,41 +403,6 @@ $pickups = $stmt->get_result();
                             <p class="mb-1"><?php echo htmlspecialchars($pickup['landmark'] . ', ' . $pickup['city_name']); ?></p>
                         </div>
                     </div>
-
-                    <div class="timeline mb-4">
-                        <div class="timeline-item">
-                            <p class="mb-0"><strong>Order Created</strong></p>
-                            <small class="text-muted">
-                                <?php echo date('M d, Y h:i A', strtotime($pickup['created_at'])); ?>
-                            </small>
-                        </div>
-                        <?php if ($pickup['pickup_status'] != 'Pending'): ?>
-                        <div class="timeline-item">
-                            <p class="mb-0"><strong>Status Updated</strong></p>
-                            <small class="text-muted">
-                                <?php echo $pickup['pickup_status']; ?>
-                            </small>
-                        </div>
-                        <?php endif; ?>
-                    </div>
-
-                    <div class="action-buttons">
-                        <?php if ($pickup['pickup_status'] == 'Pending'): ?>
-                            <button type="button" class="btn btn-success" 
-                                    onclick="updateStatus(<?php echo $pickup['id']; ?>, 'In Progress')">
-                                <i class="fas fa-truck"></i> Start Pickup
-                            </button>
-                        <?php elseif ($pickup['pickup_status'] == 'In Progress'): ?>
-                            <button type="button" class="btn btn-primary" 
-                                    onclick="updateStatus(<?php echo $pickup['id']; ?>, 'Completed')">
-                                <i class="fas fa-check"></i> Complete Pickup
-                            </button>
-                        <?php endif; ?>
-                        <button type="button" class="btn btn-outline-primary" 
-                                onclick="viewDetails(<?php echo $pickup['id']; ?>)">
-                            <i class="fas fa-eye"></i> View Details
-                        </button>
-                    </div>
                 </div>
             <?php endwhile; ?>
         <?php else: ?>
@@ -286,20 +414,19 @@ $pickups = $stmt->get_result();
         <?php endif; ?>
     </div>
 
-    <!-- Status Update Modal -->
-    <div class="modal fade" id="updateStatusModal" tabindex="-1">
-        <div class="modal-dialog">
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Update Pickup Status</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-body text-center py-4">
+                    <div class="success-animation mb-4">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3 class="text-success mb-3">Congratulations!</h3>
+                    <p class="mb-0">You've successfully completed the pickup!</p>
                 </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to update this pickup's status?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-success" id="confirmStatusUpdate">Confirm</button>
+                <div class="modal-footer justify-content-center border-0 pb-4">
+                    <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal">Continue</button>
                 </div>
             </div>
         </div>
@@ -307,11 +434,42 @@ $pickups = $stmt->get_result();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function updateStatus(cartId, newStatus) {
-            const modal = new bootstrap.Modal(document.getElementById('updateStatusModal'));
-            const confirmBtn = document.getElementById('confirmStatusUpdate');
+        function triggerConfetti() {
+            const duration = 3000;
+            const options = {
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            };
+
+            // Fire multiple confetti bursts
+            confetti({
+                ...options,
+                angle: 60,
+                origin: { x: 0 }
+            });
+            confetti({
+                ...options,
+                angle: 120,
+                origin: { x: 1 }
+            });
             
-            confirmBtn.onclick = function() {
+            // Fire another burst after a slight delay
+            setTimeout(() => {
+                confetti({
+                    particleCount: 50,
+                    spread: 50,
+                    origin: { y: 0.6 }
+                });
+            }, 500);
+        }
+
+        function completePickup(cartId) {
+            const checkbox = document.getElementById(`complete_${cartId}`);
+            
+            if (checkbox.checked) {
+                checkbox.disabled = true;
+                
                 fetch('update_pickup_status.php', {
                     method: 'POST',
                     headers: {
@@ -319,27 +477,64 @@ $pickups = $stmt->get_result();
                     },
                     body: JSON.stringify({
                         cart_id: cartId,
-                        status: newStatus
+                        status: 'Completed'
                     })
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        location.reload();
+                        // Trigger confetti immediately
+                        triggerConfetti();
+
+                        // Update UI
+                        const card = document.getElementById(`pickup-card-${cartId}`);
+                        const countdown = document.getElementById(`countdown-${cartId}`);
+                        const statusBadge = document.getElementById(`status-${cartId}`);
+                        
+                        countdown.innerHTML = '<span class="countdown completed"><i class="fas fa-check-circle"></i> Completed</span>';
+                        statusBadge.textContent = 'Completed';
+                        statusBadge.className = 'status-badge status-completed';
+                        
+                        // Show success modal
+                        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                        successModal.show();
+                        
+                        // Remove the card after a delay
+                        setTimeout(() => {
+                            card.classList.add('fade-out');
+                            setTimeout(() => {
+                                card.remove();
+                                // If no more cards, show the "all caught up" message
+                                if (document.querySelectorAll('.tracking-card').length <= 1) {
+                                    const mainContent = document.querySelector('.main-content');
+                                    mainContent.innerHTML = `
+                                        <div class="tracking-card mb-4">
+                                            <h2>Track Pickups</h2>
+                                            <p class="text-muted">Monitor and update your assigned pickup requests</p>
+                                        </div>
+                                        <div class="tracking-card text-center">
+                                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                                            <h4>All Caught Up!</h4>
+                                            <p class="text-muted">No pending pickups to track at the moment.</p>
+                                        </div>
+                                    `;
+                                }
+                            }, 500);
+                        }, 2000);
                     } else {
                         alert('Error updating status: ' + data.message);
+                        checkbox.checked = false;
+                        checkbox.disabled = false;
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     alert('Error updating status');
+                    checkbox.checked = false;
+                    checkbox.disabled = false;
                 });
-                
-                modal.hide();
-            };
-            
-            modal.show();
+            }
         }
     </script>
 </body>
-</html> 
+</html>
