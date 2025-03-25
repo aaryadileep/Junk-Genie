@@ -112,15 +112,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assigned Pickups | JunkGenie</title>
+    
+    <!-- External CSS Libraries -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom Styles -->
     <style>
-       :root {
+        /* CSS Variables */
+        :root {
             --primary-green: #2E7D32;
             --light-green: #4CAF50;
             --sidebar-width: 250px;
         }
 
+        /* Global Styles */
         body {
             margin: 0;
             padding: 0;
@@ -197,110 +203,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             transform: translateX(5px);
         }
 
-        /* Main Content */
+        /* Main Content Styles */
         .main-content {
             margin-left: var(--sidebar-width);
             padding: 2rem;
             min-height: 100vh;
         }
 
-        .profile-card {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .profile-header {
-            text-align: center;
-            margin-bottom: 2rem;
-            padding-bottom: 2rem;
-            border-bottom: 1px solid #eee;
-        }
-
-        .profile-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            margin-bottom: 1rem;
-            border: 3px solid var(--primary-green);
-            padding: 3px;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        .status-available {
-            background: #E8F5E9;
-            color: #2E7D32;
-        }
-
-        .status-unavailable {
-            background: #FFEBEE;
-            color: #C62828;
-        }
-
-        .info-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .info-label {
-            font-weight: 600;
-            color: #666;
-            margin-bottom: 0.5rem;
-        }
-
-        .info-value {
-            color: #333;
-            font-size: 1.1rem;
-        }
-
-        .edit-button {
-            background-color: var(--primary-green);
-            color: white;
-            border: none;
-            padding: 0.5rem 1.5rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .edit-button:hover {
-            background-color: var(--light-green);
-            transform: translateY(-2px);
-        }
-
-        /* Modal styles */
-        .modal-header {
-            background-color: var(--primary-green);
-            color: white;
-        }
-
-        .modal-body {
-            padding: 2rem;
-        }
-
-        .dashboard-card {
-            background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 1.5rem;
-            transition: transform 0.3s ease;
-        }
-
-        .dashboard-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .stats-icon {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
+        /* Pickup Card Styles */
         .pickup-card {
             background: white;
             border-radius: 15px;
@@ -309,12 +219,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-bottom: 1.5rem;
         }
 
+        .pickup-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .product-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
         .product-image {
             width: 100px;
             height: 100px;
             object-fit: cover;
             border-radius: 10px;
             margin-right: 1rem;
+        }
+
+        .product-details {
+            flex-grow: 1;
+        }
+
+        .item-count {
+            font-weight: bold;
+            margin-top: 1rem;
+            text-align: right;
+        }
+
+        /* Modal Styles */
+        .modal-header {
+            background-color: var(--primary-green);
+            color: white;
         }
     </style>
 </head>
@@ -350,8 +290,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <div class="item-count">Total Items: <?php echo count($pickup['products']); ?></div>
 
-                    <!-- Accept/Reject Buttons -->
-                    <div class="mt-3">
+                    <div class="mt-3 d-flex justify-content-between">
                         <form method="POST" style="display: inline;">
                             <input type="hidden" name="cart_id" value="<?php echo $pickup['cart_id']; ?>">
                             <button type="submit" name="action" value="accept" class="btn btn-success">Accept</button>
@@ -388,6 +327,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
     </div>
 
+    <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

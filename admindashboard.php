@@ -1,18 +1,89 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
 <?php
 session_start();
+require_once 'connect.php';
 
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php"); // Redirect to login if not logged in
+    header("Location: login.php");
     exit();
 }
 
 // Get user details from session
 $fullname = $_SESSION['fullname'];
+
+// Fetch total users count
+$users_query = "SELECT COUNT(*) as total_users FROM users WHERE role = 'End User'";
+$users_result = $conn->query($users_query);
+$total_users = $users_result->fetch_assoc()['total_users'];
+
+// Fetch active employees count
+$employees_query = "SELECT COUNT(*) as total_employees 
+                   FROM employees e 
+                   JOIN users u ON e.user_id = u.user_id 
+                   WHERE e.availability = 'Available'";
+$employees_result = $conn->query($employees_query);
+$active_employees = $employees_result->fetch_assoc()['total_employees'];
+
+// Fetch pending pickups count
+$pending_query = "SELECT COUNT(*) as pending_pickups FROM cart WHERE pickup_status = 'Pending'";
+$pending_result = $conn->query($pending_query);
+$pending_pickups = $pending_result->fetch_assoc()['pending_pickups'];
+
+// Fetch total e-waste collected (from completed pickups)
+$ewaste_query = "SELECT COUNT(*) as total_items 
+                 FROM cart c 
+                 JOIN cart_items ci ON c.id = ci.cart_id 
+                 WHERE c.pickup_status = 'Completed'";
+$ewaste_result = $conn->query($ewaste_query);
+$total_ewaste = $ewaste_result->fetch_assoc()['total_items'];
+
+// Fetch cities count
+$cities_query = "SELECT COUNT(*) as total_cities FROM cities";
+$cities_result = $conn->query($cities_query);
+$total_cities = $cities_result->fetch_assoc()['total_cities'];
+
+// Fetch daily pickup data for bar chart (last 7 days)
+$daily_data_query = "SELECT 
+    DATE_FORMAT(pickup_date, '%d %b') as day,
+    COUNT(*) as pickup_count
+    FROM cart
+    WHERE pickup_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+    GROUP BY DATE(pickup_date)
+    ORDER BY pickup_date";
+$daily_data_result = $conn->query($daily_data_query);
+
+$days = [];
+$daily_counts = [];
+while ($row = $daily_data_result->fetch_assoc()) {
+    $days[] = $row['day'];
+    $daily_counts[] = $row['pickup_count'];
+}
+
+// Fetch pickup status data for pie chart
+$status_query = "SELECT 
+    pickup_status,
+    COUNT(*) as status_count
+    FROM cart
+    GROUP BY pickup_status";
+$status_result = $conn->query($status_query);
+
+$status_labels = [];
+$status_counts = [];
+$status_colors = [
+    'Completed' => 'rgba(46, 204, 113, 0.8)',
+    'Pending' => 'rgba(241, 196, 15, 0.8)',
+    'Cancelled' => 'rgba(231, 76, 60, 0.8)'
+];
+
+while ($row = $status_result->fetch_assoc()) {
+    $status_labels[] = $row['pickup_status'];
+    $status_counts[] = $row['status_count'];
+}
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>E-Waste Management Admin Dashboard</title>
@@ -175,6 +246,28 @@ $fullname = $_SESSION['fullname'];
                 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             }
         }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -15px;
+        }
+        .col-md-8 {
+            flex: 0 0 66.666667%;
+            max-width: 66.666667%;
+            padding: 0 15px;
+        }
+        .col-md-4 {
+            flex: 0 0 33.333333%;
+            max-width: 33.333333%;
+            padding: 0 15px;
+        }
+        @media (max-width: 768px) {
+            .col-md-8, .col-md-4 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -189,8 +282,7 @@ $fullname = $_SESSION['fullname'];
             <div class="profile-dropdown">
                 <button class="btn btn-primary"><?php echo htmlspecialchars($fullname); ?></button>
                 <div class="profile-dropdown-content">
-                    <a href="#">Profile</a>
-                    <a href="#">Settings</a>
+                   
                     <a href="logout.php">Logout</a>
                 </div>
             </div>
@@ -199,48 +291,107 @@ $fullname = $_SESSION['fullname'];
         <div class="dashboard-cards">
             <div class="card">
                 <div class="card-title">Total Users</div>
-                <div class="card-value">1,234</div>
+                <div class="card-value"><?php echo number_format($total_users); ?></div>
             </div>
             <div class="card">
                 <div class="card-title">Active Employees</div>
-                <div class="card-value">45</div>
+                <div class="card-value"><?php echo number_format($active_employees); ?></div>
             </div>
             <div class="card">
                 <div class="card-title">Pending Pickups</div>
-                <div class="card-value">28</div>
+                <div class="card-value"><?php echo number_format($pending_pickups); ?></div>
             </div>
             <div class="card">
-                <div class="card-title">Total E-Waste Collected</div>
-                <div class="card-value">2.5 tons</div>
+                <div class="card-title">Total Items Collected</div>
+                <div class="card-value"><?php echo number_format($total_ewaste); ?> </div>
             </div>
-
-            <!-- City Count Card -->
             <div class="card">
                 <div class="card-title">Total Cities</div>
-                <div class="card-value" id="city-count">Loading...</div>
+                <div class="card-value"><?php echo number_format($total_cities); ?></div>
             </div>
         </div>
 
-        <div class="chart-container">
-            <canvas id="myChart"></canvas>
+        <div class="row">
+            <div class="col-md-8">
+                <div class="chart-container">
+                    <canvas id="dailyChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="chart-container">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Fetch City Count using AJAX
-        function fetchCityCount() {
-            fetch('getCityCount.php')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('city-count').textContent = data.cityCount;
-                })
-                .catch(error => console.log(error));
+    // Daily Pickups Bar Chart
+    const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+    new Chart(dailyCtx, {
+        type: 'bar',
+        data: {
+            labels: <?php echo json_encode($days); ?>,
+            datasets: [{
+                label: 'Daily Pickups',
+                data: <?php echo json_encode($daily_counts); ?>,
+                backgroundColor: 'rgba(76, 175, 80, 0.6)',
+                borderColor: 'rgba(76, 175, 80, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Daily Pickup Trends (Last 7 Days)',
+                    font: { size: 16 }
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
         }
+    });
 
-        // Call the function when page loads
-        window.onload = function() {
-            fetchCityCount();
-        };
+    // Pickup Status Pie Chart
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'pie',
+        data: {
+            labels: <?php echo json_encode($status_labels); ?>,
+            datasets: [{
+                data: <?php echo json_encode($status_counts); ?>,
+                backgroundColor: <?php echo json_encode(array_values($status_colors)); ?>,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Pickup Status Distribution',
+                    font: { size: 16 }
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Auto-refresh dashboard data every 5 minutes
+    setInterval(function() {
+        location.reload();
+    }, 300000);
     </script>
 </body>
 </html>

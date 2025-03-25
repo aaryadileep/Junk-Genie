@@ -28,7 +28,7 @@ if (session_status() === PHP_SESSION_NONE) {
                 </li>
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="orders.php">
+                        <a class="nav-link" href="order_details.php">
                             <i class="fas fa-box me-1"></i>My Orders
                         </a>
                     </li>

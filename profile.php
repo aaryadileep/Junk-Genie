@@ -8,6 +8,8 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
+
+// Fetch user basic info
 $query = "SELECT u.fullname, u.email, u.phone, c.city_name 
           FROM users u 
           LEFT JOIN cities c ON u.city_id = c.city_id 
@@ -18,12 +20,39 @@ $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 $stmt->close();
+
+// Fetch completed orders count
+$orders_query = "SELECT COUNT(*) as completed_orders 
+                 FROM cart 
+                 WHERE user_id = ? AND pickup_status = 'Completed'";
+$stmt_orders = $conn->prepare($orders_query);
+$stmt_orders->bind_param("i", $user_id);
+$stmt_orders->execute();
+$orders_result = $stmt_orders->get_result();
+$completed_orders = $orders_result->fetch_assoc()['completed_orders'];
+$stmt_orders->close();
+
+// Calculate loyalty points (5 points per completed order)
+$total_points = $completed_orders * 5;
+
+// Fetch total earnings from completed orders (assuming cart_items and products tables exist)
+$earnings_query = "SELECT SUM(p.price_per_pc) as total_earnings 
+                   FROM cart c 
+                   LEFT JOIN cart_items ci ON c.id = ci.cart_id 
+                   LEFT JOIN products p ON ci.product_id = p.product_id 
+                   WHERE c.user_id = ? AND c.pickup_status = 'Completed'";
+$stmt_earnings = $conn->prepare($earnings_query);
+$stmt_earnings->bind_param("i", $user_id);
+$stmt_earnings->execute();
+$earnings_result = $stmt_earnings->get_result();
+$total_earnings = $earnings_result->fetch_assoc()['total_earnings'] ?? 0;
+$stmt_earnings->close();
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile | JunkGenie</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -212,6 +241,7 @@ $stmt->close();
     </style>
     
 </head>
+
 <body>
     <!-- Navigation Header -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
@@ -239,15 +269,15 @@ $stmt->close();
                 <p class="mb-3"><?php echo htmlspecialchars($user['city_name'] ?? 'City not set'); ?></p>
                 <div class="profile-stats">
                     <div class="stat-item">
-                        <div class="stat-value">0</div>
+                        <div class="stat-value"><?php echo $completed_orders; ?></div>
                         <div class="stat-label">Orders</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value">0</div>
+                        <div class="stat-value"><?php echo $total_points; ?></div>
                         <div class="stat-label">Points</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value">₹0</div>
+                        <div class="stat-value">₹<?php echo number_format($total_earnings, 2); ?></div>
                         <div class="stat-label">Earnings</div>
                     </div>
                 </div>
@@ -261,96 +291,65 @@ $stmt->close();
                         <?php echo htmlspecialchars($user['email']); ?>
                         <span class="verification-badge"><i class="fas fa-check me-1"></i>Verified</span>
                     </div>
+                </div>
 
-                    <div class="info-group">
+                <div class="info-group">
                     <div class="info-label">Phone Number</div>
                     <div class="info-value">
                         <i class="fas fa-phone"></i>
                         <span id="displayPhone"><?php echo htmlspecialchars($user['phone']); ?></span>
                     </div>
+                    <a href="#" class="text-muted small" data-bs-toggle="modal" data-bs-target="#changePhoneModal">
+                        Change Phone Number
+                    </a>
                 </div>
 
-                
-                    <div class="d-grid gap-2">
-        <button class="edit-btn" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-            <i class="fas fa-edit me-2"></i>Edit Profile
-        </button>
-
-        <!-- 4 Buttons -->
-        <div class="mt-4">
-            <div class="row g-3">
-                <div class="col-6">
-                    <button class="btn btn-light w-100 profile-action-btn" onclick="window.location.href='loyalty-points.php'">
-                        <i class="fas fa-star text-warning me-2"></i>
-                        <span>Loyalty Points</span>
-                        <span class="badge bg-warning text-dark ms-2">0</span>
-                    </button>
-                </div>
-                <div class="col-6">
-                    <button class="btn btn-light w-100 profile-action-btn" onclick="window.location.href='addresses.php'">
-                        <i class="fas fa-map-marker-alt text-info me-2"></i>
-                        <span>Addresses</span>
-                    </button>
-                </div>
-                <div class="col-6">
-                    <button class="btn btn-light w-100 profile-action-btn" onclick="window.location.href='order_history.php'">
-                        <i class="fas fa-shopping-bag text-success me-2"></i>
-                        <span>My Orders</span>
-                    </button>
-                </div>
-                <div class="col-6">
-                    <button class="btn btn-danger w-100 profile-action-btn" onclick="confirmLogout()">
-                        <i class="fas fa-sign-out-alt me-2"></i>
-                        <span>Logout</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-                </div>
-
-             
-
+                <div class="d-grid gap-2 mt-4">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <button class="btn btn-light w-100 profile-action-btn" onclick="window.location.href='addresses.php'">
+                                <i class="fas fa-map-marker-alt text-info me-2"></i>
+                                <span>Addresses</span>
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-light w-100 profile-action-btn" onclick="window.location.href='order_history.php'">
+                                <i class="fas fa-shopping-bag text-success me-2"></i>
+                                <span>My Orders</span>
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-danger w-100 profile-action-btn" onclick="confirmLogout()">
+                                <i class="fas fa-sign-out-alt me-2"></i>
+                                <span>Logout</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Edit Profile Modal -->
-    <div class="modal fade" id="editProfileModal" tabindex="-1">
+    <!-- Change Phone Modal -->
+    <div class="modal fade" id="changePhoneModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Edit Profile</h5>
+                    <h5 class="modal-title">Change Phone Number</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editProfileForm">
+                    <form id="changePhoneForm">
                         <div class="mb-3">
-                            <label class="form-label">Phone Number</label>
-                            <input type="tel" class="form-control" id="phone" name="phone" 
-                                   value="<?php echo htmlspecialchars($user['phone']); ?>" required>
-                            <div class="invalid-feedback" id="phoneError"></div>
+                            <label class="form-label">Current Phone Number</label>
+                            <input type="tel" class="form-control" value="<?php echo htmlspecialchars($user['phone']); ?>" disabled>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Old Password</label>
-                            <input type="password" class="form-control" id="oldPassword" name="oldPassword" required>
-                            <div class="invalid-feedback" id="oldPasswordError"></div>
+                            <label class="form-label">New Phone Number</label>
+                            <input type="tel" class="form-control" id="newPhone" name="newPhone" pattern="[0-9]{10}" maxlength="10" required>
+                            <div class="invalid-feedback" id="phoneError">Please enter a valid 10-digit phone number.</div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">New Password</label>
-                            <input type="password" class="form-control" id="newPassword" name="newPassword" required>
-                            <div class="invalid-feedback" id="newPasswordError"></div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Confirm New Password</label>
-                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
-                            <div class="invalid-feedback" id="confirmPasswordError"></div>
-                        </div>
-                        <button type="button" class="btn btn-success w-100" onclick="updateProfile()">
-                            Save Changes
-                        </button>
+                        <button type="submit" class="btn btn-success w-100">Update Phone</button>
                     </form>
                 </div>
             </div>
@@ -359,80 +358,60 @@ $stmt->close();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function updateProfile() {
-    console.log("Update Profile function called"); // Debugging
-
-    const phone = document.getElementById('phone').value.trim();
-    const oldPassword = document.getElementById('oldPassword').value.trim();
-    const newPassword = document.getElementById('newPassword').value.trim();
-    const confirmPassword = document.getElementById('confirmPassword').value.trim();
-
-    // Clear previous errors
-    document.getElementById('phoneError').textContent = '';
-    document.getElementById('oldPasswordError').textContent = '';
-    document.getElementById('newPasswordError').textContent = '';
-    document.getElementById('confirmPasswordError').textContent = '';
-
+document.getElementById('changePhoneForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const newPhone = document.getElementById('newPhone').value;
+    const phoneError = document.getElementById('phoneError');
+    
     // Validate phone number
-    if (!/^[6789]\d{9}$/.test(phone)) {
-        document.getElementById('phoneError').textContent = 'Enter a valid 10-digit phone number';
+    if (!/^[0-9]{10}$/.test(newPhone)) {
+        phoneError.textContent = 'Please enter a valid 10-digit phone number.';
+        phoneError.style.display = 'block';
         return;
     }
 
-    // Validate old password
-    if (oldPassword === '') {
-        document.getElementById('oldPasswordError').textContent = 'Old password is required';
-        return;
-    }
-
-    // Validate new password
-    if (newPassword.length < 8) {
-        document.getElementById('newPasswordError').textContent = 'Password must be at least 8 characters';
-        return;
-    }
-
-    // Validate confirm password
-    if (newPassword !== confirmPassword) {
-        document.getElementById('confirmPasswordError').textContent = 'Passwords do not match';
-        return;
-    }
-
-    // Send data to server
     const formData = new FormData();
-    formData.append('phone', phone);
-    formData.append('oldPassword', oldPassword);
-    formData.append('newPassword', newPassword);
+    formData.append('newPhone', newPhone);
 
-    console.log("Sending data to server:", { phone, oldPassword, newPassword }); // Debugging
+    // Show loading state
+    const submitButton = this.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.innerHTML = 'Updating...';
 
-    fetch('updateprofile.php', {
+    fetch('update_phone.php', {
         method: 'POST',
         body: formData
     })
-    .then(response => {
-        console.log("Response received:", response); // Debugging
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
-        console.log("Data received:", data); // Debugging
         if (data.success) {
             // Update displayed phone number
-            document.getElementById('displayPhone').textContent = phone;
+            document.getElementById('displayPhone').textContent = newPhone;
+            
             // Close modal
-            bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
-            alert('Profile updated successfully!');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('changePhoneModal'));
+            modal.hide();
+            
+            // Show success message
+            alert('Phone number updated successfully!');
         } else {
-            // Display errors
-            document.getElementById('oldPasswordError').textContent = data.errors.oldPassword ?? '';
-            document.getElementById('newPasswordError').textContent = data.errors.newPassword ?? '';
+            phoneError.textContent = data.error || 'Failed to update phone number';
+            phoneError.style.display = 'block';
         }
     })
     .catch(error => {
-        console.error("Error:", error); // Debugging
-        alert('An error occurred. Please try again.');
+        console.error('Error:', error);
+        phoneError.textContent = 'An error occurred while updating the phone number';
+        phoneError.style.display = 'block';
+    })
+    .finally(() => {
+        // Reset button state
+        submitButton.disabled = false;
+        submitButton.innerHTML = 'Update Phone';
     });
-}
-// Add this to your existing <script> section
+});
+
 function confirmLogout() {
     if (confirm('Are you sure you want to logout?')) {
         window.location.href = 'logout.php';

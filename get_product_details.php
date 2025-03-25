@@ -8,19 +8,18 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'Admin') {
 }
 
 if (isset($_GET['id'])) {
-    $category_id = $_GET['id'];
+    $product_id = $_GET['id'];
     
-    $stmt = $conn->prepare("SELECT * FROM category WHERE category_id = ?");
-    $stmt->bind_param("i", $category_id);
+    $stmt = $conn->prepare("SELECT * FROM products WHERE product_id = ?");
+    $stmt->bind_param("i", $product_id);
     $stmt->execute();
     $result = $stmt->get_result();
     
-    if ($category = $result->fetch_assoc()) {
-        echo json_encode(['success' => true, 'category' => $category]);
+    if ($product = $result->fetch_assoc()) {
+        echo json_encode(['success' => true, 'product' => $product]);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Category not found']);
+        echo json_encode(['success' => false, 'message' => 'Product not found']);
     }
 } else {
     echo json_encode(['success' => false, 'message' => 'Invalid request']);
-}
-?>
+} 

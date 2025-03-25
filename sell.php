@@ -159,12 +159,204 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             background-color: #f8f9fa;
             cursor: not-allowed;
         }
+        .category-chart-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            margin-top: 75px;
+        }
+        
+        .category-chart-card:hover {
+            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+        }
+        
+        .input-group {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group:focus-within {
+            box-shadow: 0 2px 15px rgba(0,123,255,0.1);
+        }
+        
+        .input-group-text {
+            background-color: white;
+            border: none;
+            padding-left: 20px;
+        }
+        
+        #productSearch {
+            border: none;
+            padding: 15px;
+            font-size: 16px;
+        }
+        
+        #productSearch:focus {
+            box-shadow: none;
+            outline: none;
+        }
+        
+        .table {
+            margin-bottom: 0;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+        
+        .table thead th {
+            border: none;
+            font-weight: 600;
+            color: #495057;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            padding: 15px;
+        }
+        
+        .table tbody tr {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .table tbody tr:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+        
+        .table td {
+            padding: 15px;
+            vertical-align: middle;
+            border: none;
+            background-color: white;
+        }
+        
+        .table tr:first-child td:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+        
+        .table tr:first-child td:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        
+        .category-row {
+            background-color: #f8f9fa !important;
+            font-weight: 600;
+        }
+        
+        .btn-outline-primary {
+            border-radius: 8px;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-primary:hover {
+            transform: translateY(-2px);
+        }
+        
+        .text-primary {
+            color: #007bff !important;
+        }
+        
+        .search-section {
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Price column styling */
+        .table td:nth-child(4) {
+            font-weight: 600;
+            color: #28a745;
+        }
+        
+        /* Category name styling */
+        .table td:first-child {
+            font-weight: 600;
+            color: #007bff;
+        }
+        
+        /* Add loading animation */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0,123,255,0.3);
+            border-radius: 50%;
+            border-top-color: #007bff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
     <?php include 'navbar.php'; ?>
 
     <div class="container">
+        <!-- Add new chart section -->
+        <div class="category-chart-card mb-4">
+            <div class="card-header bg-transparent border-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">
+                        <i class="fas fa-box-open text-primary me-2"></i>
+                        Available Products by Category
+                    </h3>
+                    <button class="btn btn-outline-primary" id="toggleChart">
+                        <i class="fas fa-chart-bar me-2"></i>Show Product Details
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <!-- Search Section -->
+                <div class="row mb-4 search-section">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search text-primary"></i>
+                            </span>
+                            <input type="text" class="form-control" id="productSearch" 
+                                   placeholder="Search products, categories...">
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <span class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Click on any row to see more details
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Table Section -->
+                <div class="table-responsive">
+                    <table class="table table-hover category-products-table" style="display: none;">
+                        <thead class="table-light">
+                            <tr>
+                                <th><i class="fas fa-tags me-2"></i>Category</th>
+                                <th><i class="fas fa-box me-2"></i>Product Name</th>
+                                <th><i class="fas fa-info-circle me-2"></i>Description</th>
+                                <th><i class="fas fa-rupee-sign me-2"></i>Price Per Piece</th>
+                                <th><i class="fas fa-clipboard-list me-2"></i>Category Info</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <div class="sell-card">
             <h2 class="mb-4">Sell Your E-Waste</h2>
             <form action="sell.php" method="POST" enctype="multipart/form-data">
@@ -332,6 +524,170 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     });
             });
         });
+
+        // Add search functionality
+        function setupSearch(data) {
+            const searchInput = document.getElementById('productSearch');
+            const tbody = document.querySelector('.category-products-table tbody');
+            
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                // Clear table
+                tbody.innerHTML = '';
+                
+                let currentCategory = '';
+                
+                // Filter and display data
+                data.forEach(product => {
+                    if (
+                        product.category_name.toLowerCase().includes(searchTerm) ||
+                        product.product_name.toLowerCase().includes(searchTerm) ||
+                        product.description.toLowerCase().includes(searchTerm)
+                    ) {
+                        const row = document.createElement('tr');
+                        
+                        // Only show category name if it's different from the previous row
+                        const categoryCell = currentCategory !== product.category_name ? 
+                            product.category_name : '';
+                        currentCategory = product.category_name;
+                        
+                        row.innerHTML = `
+                            <td>
+                                ${categoryCell ? `<i class="fas fa-folder-open text-primary me-2"></i>${categoryCell}` : ''}
+                            </td>
+                            <td>
+                                <i class="fas fa-box text-secondary me-2"></i>${product.product_name}
+                            </td>
+                            <td>${product.description}</td>
+                            <td>
+                                <i class="fas fa-rupee-sign me-1"></i>${product.base_price}
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-info-circle me-1"></i>${product.additional_info || '-'}
+                                </span>
+                            </td>
+                        `;
+                        
+                        // Add background color to rows with new categories
+                        if (categoryCell) {
+                            row.style.backgroundColor = '#f8f9fa';
+                        }
+                        
+                        tbody.appendChild(row);
+                    }
+                });
+            });
+        }
+
+        // Update the toggle chart event listener
+        document.getElementById('toggleChart').addEventListener('click', function() {
+            const table = document.querySelector('.category-products-table');
+            const button = this;
+            const searchSection = document.querySelector('.search-section');
+            
+            if (table.style.display === 'none') {
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Loading...';
+                
+                // Show search section immediately
+                searchSection.style.display = 'flex';
+                
+                fetch('get_category_products.php')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Received data:', data);
+                        
+                        if (!data || data.length === 0) {
+                            throw new Error('No data received');
+                        }
+
+                        const tbody = table.querySelector('tbody');
+                        tbody.innerHTML = '';
+                        
+                        let currentCategory = '';
+                        
+                        data.forEach(product => {
+                            const row = document.createElement('tr');
+                            
+                            const categoryCell = currentCategory !== product.category_name ? 
+                                product.category_name : '';
+                            currentCategory = product.category_name;
+                            
+                            row.innerHTML = `
+                                <td>
+                                    ${categoryCell ? `<i class="fas fa-folder-open text-primary me-2"></i>${categoryCell}` : ''}
+                                </td>
+                                <td>
+                                    <i class="fas fa-box text-secondary me-2"></i>${product.product_name}
+                                </td>
+                                <td>${product.description}</td>
+                                <td>
+                                    <i class="fas fa-rupee-sign me-1"></i>${product.base_price}
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark">
+                                        <i class="fas fa-info-circle me-1"></i>${product.additional_info || '-'}
+                                    </span>
+                                </td>
+                            `;
+                            
+                            if (categoryCell) {
+                                row.style.backgroundColor = '#f8f9fa';
+                            }
+                            
+                            tbody.appendChild(row);
+                        });
+                        
+                        // Setup search functionality
+                        setupSearch(data);
+                        
+                        table.style.display = 'table';
+                        button.innerHTML = '<i class="fas fa-chart-bar me-2"></i>Hide Product Details';
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Failed to load product details: ' + error.message,
+                            icon: 'error'
+                        });
+                        searchSection.style.display = 'none';
+                    })
+                    .finally(() => {
+                        button.disabled = false;
+                    });
+            } else {
+                table.style.display = 'none';
+                searchSection.style.display = 'none';
+                button.innerHTML = '<i class="fas fa-chart-bar me-2"></i>Show Product Details';
+            }
+        });
+
+        // Add row click animation
+        document.querySelectorAll('.category-products-table tbody tr').forEach(row => {
+            row.addEventListener('click', function() {
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 100);
+            });
+        });
+
+        // Show/hide search section with animation
+        const searchSection = document.querySelector('.search-section');
+        const table = document.querySelector('.category-products-table');
+        if (table.style.display === 'none') {
+            searchSection.style.display = 'none';
+        } else {
+            searchSection.style.display = 'flex';
+        }
     </script>
 </body>
 </html>

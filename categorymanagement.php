@@ -76,15 +76,63 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_product'])) {
         $category_id = $_POST['category_id'];
         $product_name = trim($_POST['product_name']);
         $description = trim($_POST['description']);
-        $price_per_kg = trim($_POST['price_per_kg']);
+        $price_per_pc = trim($_POST['price_per_pc']);
 
-        $stmt = $conn->prepare("INSERT INTO products (category_id, product_name, description, price_per_kg) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("issd", $category_id, $product_name, $description, $price_per_kg);
+        $stmt = $conn->prepare("INSERT INTO products (category_id, product_name, description, price_per_pc) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("issd", $category_id, $product_name, $description, $price_per_pc);
         
         if ($stmt->execute()) {
             $_SESSION['success'] = "Product added successfully";
         } else {
             throw new Exception("Failed to add product");
+        }
+    } catch (Exception $e) {
+        $_SESSION['error'] = $e->getMessage();
+    }
+    
+    header("Location: categorymanagement.php");
+    exit();
+}
+
+// Handle updating category
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_category'])) {
+    try {
+        $category_id = $_POST['category_id'];
+        $category_name = trim($_POST['category_name']);
+        $description = trim($_POST['description']);
+
+        $stmt = $conn->prepare("UPDATE category SET category_name = ?, description = ? WHERE category_id = ?");
+        $stmt->bind_param("ssi", $category_name, $description, $category_id);
+        
+        if ($stmt->execute()) {
+            $_SESSION['success'] = "Category updated successfully";
+        } else {
+            throw new Exception("Failed to update category");
+        }
+    } catch (Exception $e) {
+        $_SESSION['error'] = $e->getMessage();
+    }
+    
+    header("Location: categorymanagement.php");
+    exit();
+}
+
+// Handle updating product
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_product'])) {
+    try {
+        $product_id = $_POST['product_id'];
+        $category_id = $_POST['category_id'];
+        $product_name = trim($_POST['product_name']);
+        $description = trim($_POST['description']);
+        $price_per_pc = trim($_POST['price_per_pc']);
+
+        $stmt = $conn->prepare("UPDATE products SET category_id = ?, product_name = ?, description = ?, price_per_pc = ? WHERE product_id = ?");
+        $stmt->bind_param("issdi", $category_id, $product_name, $description, $price_per_pc, $product_id);
+        
+        if ($stmt->execute()) {
+            $_SESSION['success'] = "Product updated successfully";
+        } else {
+            throw new Exception("Failed to update product");
         }
     } catch (Exception $e) {
         $_SESSION['error'] = $e->getMessage();
@@ -496,10 +544,10 @@ $product_result = $conn->query($product_query);
                             <textarea class="form-control" name="description" rows="3" required></textarea>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Price per Kg (₹)</label>
+                            <label class="form-label">Price per Pc (₹)</label>
                             <div class="input-group">
                                 <span class="input-group-text">₹</span>
-                                <input type="number" step="0.01" class="form-control" name="price_per_kg" required>
+                                <input type="number" step="0.01" class="form-control" name="price_per_pc" required>
                             </div>
                         </div>
                         <button type="submit" name="add_product" class="btn btn-success w-100">
@@ -511,7 +559,7 @@ $product_result = $conn->query($product_query);
         </div>
     </div>
 
-    <!-- Edit Category Modal (Placeholder) -->
+    <!-- Edit Category Modal -->
     <div class="modal fade" id="editCategoryModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -524,17 +572,65 @@ $product_result = $conn->query($product_query);
                 </div>
                 <div class="modal-body">
                     <form id="editCategoryForm" method="POST">
-                        <input type="hidden" name="edit_category_id" id="edit_category_id">
+                        <input type="hidden" name="category_id" id="edit_category_id">
                         <div class="mb-3">
                             <label class="form-label">Category Name</label>
-                            <input type="text" class="form-control" name="edit_category_name" id="edit_category_name" required>
+                            <input type="text" class="form-control" name="category_name" id="edit_category_name" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Description</label>
-                            <textarea class="form-control" name="edit_description" id="edit_description" rows="3" required></textarea>
+                            <textarea class="form-control" name="description" id="edit_description" rows="3" required></textarea>
                         </div>
                         <button type="submit" name="update_category" class="btn btn-primary w-100">
                             <i class="fas fa-save me-2"></i>Update Category
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Product Modal -->
+    <div class="modal fade" id="editProductModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-edit me-2 text-primary"></i>
+                        Edit Product
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editProductForm" method="POST">
+                        <input type="hidden" name="product_id" id="edit_product_id">
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <select class="form-select" name="category_id" id="edit_product_category_id" required>
+                                <?php
+                                $result->data_seek(0);
+                                while($row = $result->fetch_assoc()): ?>
+                                    <option value="<?php echo $row['category_id']; ?>"><?php echo htmlspecialchars($row['category_name']); ?></option>
+                                <?php endwhile; ?>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Product Name</label>
+                            <input type="text" class="form-control" name="product_name" id="edit_product_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="description" id="edit_product_description" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Price per Pc (₹)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                <input type="number" step="0.01" class="form-control" name="price_per_pc" id="edit_product_price" required>
+                            </div>
+                        </div>
+                        <button type="submit" name="update_product" class="btn btn-primary w-100">
+                            <i class="fas fa-save me-2"></i>Update Product
                         </button>
                     </form>
                 </div>
@@ -591,9 +687,9 @@ $product_result = $conn->query($product_query);
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        document.getElementById('edit_category_id').value = data.category_id;
-                        document.getElementById('edit_category_name').value = data.category_name;
-                        document.getElementById('edit_description').value = data.description;
+                        document.getElementById('edit_category_id').value = data.category.category_id;
+                        document.getElementById('edit_category_name').value = data.category.category_name;
+                        document.getElementById('edit_description').value = data.category.description;
                         new bootstrap.Modal(document.getElementById('editCategoryModal')).show();
                     } else {
                         alert(data.message || "Failed to fetch category details");
@@ -602,9 +698,23 @@ $product_result = $conn->query($product_query);
                 .catch(error => console.error('Error:', error));
         }
 
-        // Function to populate and open the edit product modal (placeholder)
+        // Function to populate and open the edit product modal
         function editProduct(productId) {
-            alert("Edit product functionality to be implemented.");
+            fetch(`get_product_details.php?id=${productId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('edit_product_id').value = data.product.product_id;
+                        document.getElementById('edit_product_category_id').value = data.product.category_id;
+                        document.getElementById('edit_product_name').value = data.product.product_name;
+                        document.getElementById('edit_product_description').value = data.product.description;
+                        document.getElementById('edit_product_price').value = data.product.price_per_pc;
+                        new bootstrap.Modal(document.getElementById('editProductModal')).show();
+                    } else {
+                        alert(data.message || "Failed to fetch product details");
+                    }
+                })
+                .catch(error => console.error('Error:', error));
         }
     </script>
 </body>

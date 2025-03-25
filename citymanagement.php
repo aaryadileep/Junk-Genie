@@ -90,137 +90,26 @@ $result = $conn->query($query);
             --info: #2196f3;
         }
 
-        /* Sidebar Styles */
-        .sidebar {
-            width: 250px;
-            height: 100vh;
-            background-color: var(--primary);
-            padding: 20px;
-            position: fixed;
-            left: 0;
-            top: 0;
-            overflow-y: auto;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        body {
+            background: #f5f6fa;
+            min-height: 100vh;
         }
 
-        .logo {
-            color: white;
-            font-size: 24px;
-            margin-bottom: 30px;
-            text-align: center;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .logo img {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
-        }
-
-        .nav-menu {
-            list-style: none;
-        }
-
-        .nav-item {
-            margin-bottom: 10px;
-        }
-
-        .nav-link {
-            color: #fff;
-            text-decoration: none;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            border-radius: 5px;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
-        .nav-link:hover {
-            background-color: var(--primary-dark);
-            transform: translateX(5px);
-        }
-
-        .nav-link i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-
-        /* Main Content Styles */
         .main-content {
-            margin-left: 250px;
+            margin-left: 280px;
             padding: 20px;
-            width: calc(100% - 250px);
         }
 
         .header {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            background-color: white;
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-
-        .header h1 {
-            color: var(--primary);
-            font-size: 24px;
-            display: flex;
-            align-items: center;
-        }
-
-        .header h1 img {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
-        }
-
-        .profile-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .profile-dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            background-color: white;
-            min-width: 150px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            z-index: 1;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .profile-dropdown-content a {
-            color: var(--primary);
-            padding: 10px;
-            text-decoration: none;
-            display: block;
-            transition: background-color 0.3s;
-        }
-
-        .profile-dropdown-content a:hover {
-            background-color: var(--primary-light);
-            color: var(--primary-dark);
-        }
-
-        .profile-dropdown:hover .profile-dropdown-content {
-            display: block;
-        }
-
-        .table-container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
-
         .status-badge {
             padding: 5px 10px;
             border-radius: 20px;
@@ -319,50 +208,68 @@ $result = $conn->query($query);
             transform: translateX(26px);
         }
         .modal-header {
-    border-radius: 10px 10px 0 0;
-}
+            border-radius: 10px 10px 0 0;
+        }
 
-.modal-content {
-    border-radius: 10px;
-    border: none;
-}
+        .modal-content {
+            border-radius: 10px;
+            border: none;
+        }
 
-.form-control:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
-}
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+        }
 
-.is-invalid {
-    border-color: var(--danger) !important;
-}
+        .is-invalid {
+            border-color: var(--danger) !important;
+        }
 
-.invalid-feedback {
-    color: var(--danger);
-    font-size: 0.875em;
-    margin-top: 0.25rem;
-}
+        .invalid-feedback {
+            color: var(--danger);
+            font-size: 0.875em;
+            margin-top: 0.25rem;
+        }
+        
+        /* Improved table styling */
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        #citiesTable th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        #citiesTable td {
+            vertical-align: middle;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.25rem;
+            margin-left: 2px;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: var(--primary) !important;
+            color: white !important;
+            border: none;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: var(--primary-light);
+            color: var(--primary-dark) !important;
+            border: 1px solid var(--primary);
+        }
     </style>
 </head>
 
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="logo">
-            <img src="logo.jpg" alt="JunkGenie Logo">
-            JunkGenie
-        </div>
-        <ul class="nav-menu">
-            <li class="nav-item"><a href="admindashboard.php" class="nav-link"><i class="fas fa-tachometer-alt"></i>Dashboard</a></li>
-            <li class="nav-item"><a href="usermanagement.php" class="nav-link"><i class="fas fa-users"></i>User Management</a></li>
-            <li class="nav-item"><a href="employeemanagement.php" class="nav-link"><i class="fas fa-user-tie"></i>Employee Management</a></li>
-            <li class="nav-item"><a href="categorymanagement.php" class="nav-link"><i class="fas fa-box"></i>Categories & Products</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-truck"></i>Pickup Requests</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-recycle"></i>E-Waste Collection</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-chart-line"></i>Reports & Analytics</a></li>
-            <li class="nav-item"><a href="citymanagement.php" class="nav-link"><i class="fas fa-city"></i>City Management</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-cog"></i>Settings</a></li>
-        </ul>
-    </div>
+<?php include 'sidebar.php'; ?>
 
     <!-- Main Content -->
     <div class="main-content">
@@ -377,17 +284,12 @@ $result = $conn->query($query);
         </div>
 
         <!-- Success/Error Messages -->
-        <?php if (isset($success)): ?>
-            <div class="alert alert-success"><?php echo $success; ?></div>
-        <?php endif; ?>
-        <?php if (isset($error)): ?>
-            <div class="alert alert-danger"><?php echo $error; ?></div>
-        <?php endif; ?>
+        <div id="messageContainer"></div>
 
         <!-- City Table -->
         <div class="table-container">
-            <table id="citiesTable" class="table table-hover">
-                <thead>
+            <table id="citiesTable" class="table table-hover table-striped" style="width:100%">
+                <thead class="table-light">
                     <tr>
                         <th>S.No</th>
                         <th>City Name</th>
@@ -427,118 +329,147 @@ $result = $conn->query($query);
         </div>
     </div>
 
-    
-<!-- Add City Modal -->
-<div class="modal fade" id="addCityModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title">Add New City</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="addCityForm" method="POST">
-                    <div class="mb-3">
-                        <label class="form-label">City Name</label>
-                        <input type="text" class="form-control" name="city_name" id="city_name" required>
-                        <div class="invalid-feedback" id="cityNameError"></div>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-plus me-2"></i>Add City
-                    </button>
-                </form>
+    <!-- Add City Modal -->
+    <div class="modal fade" id="addCityModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Add New City</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addCityForm" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">City Name</label>
+                            <input type="text" class="form-control" name="city_name" id="city_name" required>
+                            <div class="invalid-feedback" id="cityNameError"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-plus me-2"></i>Add City
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script>
+        // Initialize DataTable only once
         $(document).ready(function() {
-            $('#citiesTable').DataTable({
-                "order": [[0, "asc"]],
-                "pageLength": 10
+            if (!$.fn.DataTable.isDataTable('#citiesTable')) {
+                $('#citiesTable').DataTable({
+                    "order": [[0, "asc"]],
+                    "pageLength": 10,
+                    "responsive": true,
+                    "language": {
+                        "search": "_INPUT_",
+                        "searchPlaceholder": "Search cities...",
+                        "lengthMenu": "Show _MENU_ cities per page",
+                        "paginate": {
+                            "previous": "<i class='fas fa-chevron-left'></i>",
+                            "next": "<i class='fas fa-chevron-right'></i>"
+                        }
+                    },
+                    "dom": "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+                           "<'row'<'col-sm-12'tr>>" +
+                           "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>"
+                });
+            }
+            
+            // Handle form submission with better feedback
+            $('#addCityForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                const cityName = $('#city_name').val().trim();
+                const errorContainer = $('#cityNameError');
+                
+                // Reset previous errors
+                errorContainer.text('');
+                $('#city_name').removeClass('is-invalid');
+                
+                // Validate city name
+                if (!cityName) {
+                    errorContainer.text('City name is required');
+                    $('#city_name').addClass('is-invalid');
+                    return;
+                }
+
+                // Submit form using AJAX
+                $.ajax({
+                    url: 'citymanagement.php',
+                    type: 'POST',
+                    data: {
+                        add_city: 1,
+                        city_name: cityName
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            // Show success message
+                            showMessage('City added successfully!', 'success');
+                            // Close modal
+                            $('#addCityModal').modal('hide');
+                            // Reset form
+                            $('#addCityForm')[0].reset();
+                            // Reload page to show new city
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            // Show error message
+                            errorContainer.text(response.error || 'Failed to add city');
+                            $('#city_name').addClass('is-invalid');
+                        }
+                    },
+                    error: function() {
+                        showMessage('An error occurred. Please try again.', 'danger');
+                    }
+                });
             });
         });
 
+        // Status toggle function
         function toggleStatus(cityId, status) {
-            fetch('citymanagement.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+            $.ajax({
+                url: 'citymanagement.php',
+                type: 'POST',
+                data: {
+                    toggle_status: 1,
+                    city_id: cityId,
+                    new_status: status ? 1 : 0
                 },
-                body: `toggle_status=1&city_id=${cityId}&new_status=${status ? 1 : 0}`
-            })
-            .then(response => window.location.reload());
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        showMessage('Status updated successfully!', 'success');
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        showMessage(response.error || 'Failed to update status', 'danger');
+                        setTimeout(() => location.reload(), 1000);
+                    }
+                },
+                error: function() {
+                    showMessage('An error occurred. Please try again.', 'danger');
+                }
+            });
         }
-        $(document).ready(function() {
-    // Initialize DataTable
-    $('#citiesTable').DataTable({
-        "order": [[0, "asc"]],
-        "pageLength": 10,
-        "language": {
-            "search": "Search cities:",
-            "lengthMenu": "Show _MENU_ cities per page"
-        }
-    });
-
-    // Handle form submission
-    $('#addCityForm').on('submit', function(e) {
-        e.preventDefault();
         
-        const cityName = $('#city_name').val().trim();
-        
-        // Reset previous errors
-        $('#cityNameError').text('');
-        $('#city_name').removeClass('is-invalid');
-
-        // Validate city name
-        if (!cityName) {
-            $('#cityNameError').text('City name is required');
-            $('#city_name').addClass('is-invalid');
-            return;
+        // Function to show messages
+        function showMessage(message, type) {
+            const messageContainer = $('#messageContainer');
+            messageContainer.html(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>`);
+            
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                messageContainer.find('.alert').alert('close');
+            }, 5000);
         }
-
-        // Submit form using fetch
-        fetch('citymanagement.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `add_city=1&city_name=${encodeURIComponent(cityName)}`
-        })
-        .then(response => response.text())
-        .then(data => {
-            // Close modal
-            $('#addCityModal').modal('hide');
-            
-            // Reset form
-            $('#addCityForm')[0].reset();
-            
-            // Reload page to show new city
-            window.location.reload();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Failed to add city. Please try again.');
-        });
-    });
-});
-
-// Status toggle function
-function toggleStatus(cityId, status) {
-    fetch('citymanagement.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `toggle_status=1&city_id=${cityId}&new_status=${status ? 1 : 0}`
-    })
-    .then(response => window.location.reload());
-}
-</script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </script>
 </body>
 </html>
