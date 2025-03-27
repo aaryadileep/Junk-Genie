@@ -163,47 +163,94 @@ $product_result = $conn->query($product_query);
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <style>
+        :root {
+            --primary-green: #2ecc71;
+            --secondary-green: #27ae60;
+            --light-green: #d4edda;
+            --dark-green: #155724;
+            --background-soft: #f4f6f7;
+        }
+
+        body {
+            background-color: var(--background-soft);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            background-color: var(--primary-green);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            transition: all 0.3s ease;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-logo {
+            padding: 20px;
+            text-align: center;
+            background-color: var(--secondary-green);
+        }
+
+        .sidebar-menu {
+            padding: 20px;
+        }
+
+        .sidebar-menu a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar-menu a:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .container-fluid {
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
         .stats-card {
-            background: #fff;
+            background: white;
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--primary-green);
+            transition: transform 0.3s ease;
         }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+
         .stats-icon {
-            font-size: 2rem;
-            margin-bottom: 10px;
+            color: var(--primary-green);
+            font-size: 2.5rem;
+            margin-bottom: 15px;
         }
-        .stats-icon.primary {
-            color: #007bff;
-        }
-        .stats-icon.success {
-            color: #28a745;
-        }
-        .status-badge {
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-        }
-        .status-active {
-            background: #d4edda;
-            color: #155724;
-        }
-        .status-inactive {
-            background: #f8d7da;
-            color: #721c24;
-        }
+
         .status-toggle {
             position: relative;
             display: inline-block;
             width: 60px;
             height: 34px;
         }
+
         .status-toggle input {
             opacity: 0;
             width: 0;
             height: 0;
         }
+
         .slider {
             position: absolute;
             cursor: pointer;
@@ -215,6 +262,7 @@ $product_result = $conn->query($product_query);
             transition: 0.4s;
             border-radius: 34px;
         }
+
         .slider:before {
             position: absolute;
             content: "";
@@ -226,51 +274,34 @@ $product_result = $conn->query($product_query);
             transition: 0.4s;
             border-radius: 50%;
         }
+
         input:checked + .slider {
-            background-color: #28a745;
+            background-color: var(--primary-green);
         }
+
         input:checked + .slider:before {
             transform: translateX(26px);
         }
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        .table-hover tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-        .container-fluid {
-        margin-left: 280px; /* Same width as sidebar */
-        width: calc(100% - 280px);
-        transition: margin-left 0.3s ease;
-    }
 
-    /* Update sidebar styles */
-    .sidebar {
-        position: fixed;
-        left: 0;
-        top: 0;
-        height: 100vh;
-        width: 280px;
-        z-index: 1000;
-        background: #fff;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    @media (max-width: 768px) {
-        .container-fluid {
-            margin-left: 0;
-            width: 100%;
+        .table-hover tbody tr:hover {
+            background-color: var(--light-green);
         }
-        
-        .sidebar {
-            transform: translateX(-100%);
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 250px;
+            }
+
+            .container-fluid {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
         }
-        
-        .sidebar.show {
-            transform: translateX(0);
-        }
-    }
     </style>
 </head>
 

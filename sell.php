@@ -123,183 +123,166 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sell E-Waste | JunkGenie</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #f8f9fa; padding-top: 20px; }
-        .container { max-width: 1000px; margin-bottom: 20px; }
-        .sell-card { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 15px rgba(0,0,0,0.1); margin-bottom: 20px; margin-top: 75px; }
-        .item { background: #f8f9fa; border-radius: 10px; padding: 20px; margin-bottom: 15px; border: 1px solid #dee2e6; transition: all 0.3s ease; }
-        .item:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.1); transform: translateY(-2px); }
-        .form-label { font-weight: 500; color: #495057; margin-bottom: 8px; }
-        .form-control, .form-select { border-radius: 8px; padding: 10px 15px; border: 1px solid #dee2e6; }
-        .btn-remove { background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 6px; transition: all 0.3s ease; }
-        .btn-remove:hover { background: #c82333; transform: translateY(-1px); }
-        .btn-add { background: #28a745; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 500; transition: all 0.3s ease; }
-        .btn-add:hover { background: #218838; transform: translateY(-2px); }
-        .btn-proceed { background: #007bff; color: white; border: none; padding: 15px 30px; border-radius: 8px; font-weight: 500; transition: all 0.3s ease; }
-        .btn-proceed:hover { background: #0056b3; transform: translateY(-2px); }
-        .preview-image { max-width: 150px; border-radius: 8px; margin-top: 10px; }
-        .loading-spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; margin-left: 10px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .error-message { color: #dc3545; font-size: 0.875em; margin-top: 5px; }
-        .loading-spinner {
-            display: none;
-            position: absolute;
-            right: 30px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-        .product-select:disabled {
-            background-color: #f8f9fa;
-            cursor: not-allowed;
-        }
-        .category-chart-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-            margin-top: 75px;
-        }
-        
-        .category-chart-card:hover {
-            box-shadow: 0 0 30px rgba(0,0,0,0.1);
-        }
-        
-        .input-group {
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            border-radius: 12px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .input-group:focus-within {
-            box-shadow: 0 2px 15px rgba(0,123,255,0.1);
-        }
-        
-        .input-group-text {
-            background-color: white;
-            border: none;
-            padding-left: 20px;
-        }
-        
-        #productSearch {
-            border: none;
-            padding: 15px;
-            font-size: 16px;
-        }
-        
-        #productSearch:focus {
-            box-shadow: none;
-            outline: none;
-        }
-        
-        .table {
-            margin-bottom: 0;
-            border-collapse: separate;
-            border-spacing: 0 8px;
-        }
-        
-        .table thead th {
-            border: none;
-            font-weight: 600;
-            color: #495057;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            padding: 15px;
-        }
-        
-        .table tbody tr {
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            border-radius: 8px;
-            transition: all 0.2s ease;
-        }
-        
-        .table tbody tr:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            cursor: pointer;
-        }
-        
-        .table td {
-            padding: 15px;
-            vertical-align: middle;
-            border: none;
-            background-color: white;
-        }
-        
-        .table tr:first-child td:first-child {
-            border-top-left-radius: 8px;
-            border-bottom-left-radius: 8px;
-        }
-        
-        .table tr:first-child td:last-child {
-            border-top-right-radius: 8px;
-            border-bottom-right-radius: 8px;
-        }
-        
-        .category-row {
-            background-color: #f8f9fa !important;
-            font-weight: 600;
-        }
-        
-        .btn-outline-primary {
-            border-radius: 8px;
-            padding: 10px 20px;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-outline-primary:hover {
-            transform: translateY(-2px);
-        }
-        
-        .text-primary {
-            color: #007bff !important;
-        }
-        
-        .search-section {
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Price column styling */
-        .table td:nth-child(4) {
-            font-weight: 600;
-            color: #28a745;
-        }
-        
-        /* Category name styling */
-        .table td:first-child {
-            font-weight: 600;
-            color: #007bff;
-        }
-        
-        /* Add loading animation */
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(0,123,255,0.3);
-            border-radius: 50%;
-            border-top-color: #007bff;
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-    </style>
-</head>
+<style>
+    body { 
+        background-color: #e6f3e6; 
+        padding-top: 20px; 
+        font-family: 'Montserrat', sans-serif; 
+    }
+    .container { 
+        max-width: 1000px; 
+        margin-bottom: 20px; 
+    }
+    .sell-card { 
+        background: linear-gradient(135deg, #ffffff, #f0f7f0);
+        border-radius: 15px; 
+        padding: 30px; 
+        box-shadow: 0 10px 30px rgba(39, 174, 96, 0.15); 
+        margin-bottom: 20px; 
+        margin-top: 75px; 
+        border: 2px solid #2ecc71;
+    }
+    .item { 
+        background: #f0f7f0; 
+        border-radius: 10px; 
+        padding: 20px; 
+        margin-bottom: 15px; 
+        border: 1px solid #27ae60; 
+        transition: all 0.3s ease; 
+    }
+    .item:hover { 
+        box-shadow: 0 8px 25px rgba(39, 174, 96, 0.2); 
+        transform: translateY(-5px); 
+        border-color: #2ecc71;
+    }
+    .form-label { 
+        font-weight: 600; 
+        color: #2c3e50; 
+        margin-bottom: 8px; 
+        text-transform: uppercase;
+    }
+    .form-control, .form-select { 
+        border-radius: 8px; 
+        padding: 10px 15px; 
+        border: 2px solid #27ae60; 
+        background-color: #f0f7f0;
+    }
+    .btn-remove { 
+        background: #e74c3c; 
+        color: white; 
+        border: none; 
+        padding: 8px 15px; 
+        border-radius: 6px; 
+        transition: all 0.3s ease; 
+    }
+    .btn-remove:hover { 
+        background: #c0392b; 
+        transform: translateY(-2px); 
+    }
+    .btn-add { 
+        background: #2ecc71; 
+        color: white; 
+        border: none; 
+        padding: 12px 25px; 
+        border-radius: 8px; 
+        font-weight: 500; 
+        transition: all 0.3s ease; 
+    }
+    .btn-add:hover { 
+        background: #27ae60; 
+        transform: translateY(-2px); 
+        box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+    }
+    .btn-proceed { 
+        background: #2ecc71; 
+        color: white; 
+        border: none; 
+        padding: 15px 30px; 
+        border-radius: 8px; 
+        font-weight: 600; 
+        transition: all 0.3s ease; 
+        text-transform: uppercase;
+    }
+    .btn-proceed:hover { 
+        background: #27ae60; 
+        transform: translateY(-2px); 
+        box-shadow: 0 8px 25px rgba(39, 174, 96, 0.3);
+    }
+    .preview-image { 
+        max-width: 150px; 
+        border-radius: 8px; 
+        margin-top: 10px; 
+        border: 3px solid #2ecc71;
+    }
+    @keyframes spin { 
+        0% { transform: rotate(0deg); } 
+        100% { transform: rotate(360deg); } 
+    }
+    .loading-spinner { 
+        border: 4px solid #f0f7f0; 
+        border-top: 4px solid #2ecc71; 
+        border-radius: 50%; 
+        width: 20px; 
+        height: 20px; 
+        animation: spin 1s linear infinite; 
+        display: inline-block; 
+        margin-left: 10px; 
+    }
+    .error-message { 
+        color: #e74c3c; 
+        font-size: 0.875em; 
+        margin-top: 5px; 
+    }
+    .category-chart-card {
+        background: linear-gradient(135deg, #ffffff, #f0f7f0);
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(39, 174, 96, 0.1);
+        transition: all 0.3s ease;
+        margin-top: 75px;
+        border: 2px solid #27ae60;
+    }
+    .category-chart-card:hover {
+        box-shadow: 0 15px 40px rgba(39, 174, 96, 0.2);
+        transform: translateY(-5px);
+    }
+    .input-group {
+        box-shadow: 0 2px 10px rgba(39, 174, 96, 0.1);
+        border-radius: 12px;
+        overflow: hidden;
+        border: 2px solid #27ae60;
+    }
+    .input-group-text {
+        background-color: #f0f7f0;
+        border: none;
+        color: #2c3e50;
+    }
+    #productSearch {
+        border: none;
+        padding: 15px;
+        font-size: 16px;
+        background-color: #f0f7f0;
+    }
+    .table thead th {
+        background-color: #2ecc71;
+        color: white;
+        border: none;
+        text-transform: uppercase;
+    }
+    .table tbody tr {
+        background-color: white;
+        transition: all 0.3s ease;
+        border-left: 5px solid #2ecc71;
+    }
+    .table tbody tr:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(39, 174, 96, 0.1);
+    }
+    .category-row {
+        background-color: #f0f7f0 !important;
+        color: #2c3e50;
+    }
+</style>
 <body>
     <?php include 'navbar.php'; ?>
 

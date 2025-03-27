@@ -36,72 +36,83 @@ $orders = $stmt->get_result();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #f8f9fa;
-            padding-top: 20px;
-        }
-        .order-box {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-        }
-        .order-box:hover {
-            transform: translateY(-5px);
-        }
-        .order-id {
-            color: #4CAF50;
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-        .status-badge {
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-        .status-Pending {
-            background-color: #ffd700;
-            color: #000;
-        }
-        .status-Confirmed {
-            background-color: #4CAF50;
-            color: white;
-        }
-        .status-Cancelled {
-            background-color: #ff6b6b;
-            color: white;
-        }
-        .status-Completed {
-            background-color: #2196F3;
-            color: white;
-        }
-        .btn-open {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-        .btn-open:hover {
-            background-color: #45a049;
-            color: white;
-            transform: translateY(-2px);
-        }
-        .empty-state {
-            text-align: center;
-            padding: 50px 20px;
-        }
-        .empty-state i {
-            font-size: 4rem;
-            color: #ccc;
-            margin-bottom: 20px;
-        }
-    </style>
-</head>
+    body {
+        background-color: #e6f3e6;
+        padding-top: 20px;
+        font-family: 'Montserrat', sans-serif;
+    }
+    .order-box {
+        background: linear-gradient(135deg, #ffffff, #f0f7f0);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(39, 174, 96, 0.15);
+        transition: all 0.3s ease;
+        border: 2px solid #2ecc71;
+    }
+    .order-box:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(39, 174, 96, 0.2);
+    }
+    .order-id {
+        color: #2ecc71;
+        font-size: 1.2rem;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    .status-badge {
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    .status-Pending {
+        background-color: #ffd700;
+        color: #2c3e50;
+    }
+    .status-Confirmed {
+        background-color: #2ecc71;
+        color: white;
+    }
+    .status-Cancelled {
+        background-color: #e74c3c;
+        color: white;
+    }
+    .status-Completed {
+        background-color: #3498db;
+        color: white;
+    }
+    .btn-open {
+        background-color: #2ecc71;
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    .btn-open:hover {
+        background-color: #27ae60;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+    }
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        background-color: #f0f7f0;
+        border-radius: 15px;
+        border: 2px dashed #2ecc71;
+    }
+    .empty-state i {
+        font-size: 4rem;
+        color: #2ecc71;
+        margin-bottom: 20px;
+        opacity: 0.7;
+    }
+</style>
 <body>
     <?php include 'navbar.php'; ?>
 

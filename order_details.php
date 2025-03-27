@@ -66,90 +66,100 @@ if ($order_details['pickup_status'] === 'Rejected') {
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Details | JunkGenie</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            padding-top: 20px;
-        }
-        .details-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            margin-top:80px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .order-header {
-            border-bottom: 2px solid #eee;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
-        .status-badge {
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-        .item-image {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 10px;
-        }
-        .item-card {
-            border: 1px solid #eee;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-        .status-badge.status-Pending {
-            background-color: #ffd700;
-            color: #000;
-        }
-        .status-badge.status-Confirmed {
-            background-color: #ff9800;
-            color: white;
-        }
-        .status-badge.status-Completed {
-            background-color: #4CAF50;
-            color: white;
-        }
-        .status-badge.status-Rejected,
-        .status-badge.status-Cancelled {
-            background-color: #ff5252;
-            color: white;
-        }
-        .btn-cancel {
-            background-color: #ff5252;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-        .btn-cancel:hover {
-            background-color: #ff1744;
-            transform: translateY(-2px);
-        }
-        .btn-reason {
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-        .btn-reason:hover {
-            background-color: #5a6268;
-            transform: translateY(-2px);
-        }
-    </style>
+<style>
+    body {
+        background-color: #e6f3e6;
+        padding-top: 20px;
+        font-family: 'Montserrat', sans-serif;
+    }
+    .details-card {
+        background: linear-gradient(135deg, #ffffff, #f0f7f0);
+        border-radius: 15px;
+        padding: 25px;
+        margin-top: 80px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(39, 174, 96, 0.15);
+        border: 2px solid #2ecc71;
+    }
+    .order-header {
+        border-bottom: 2px solid #27ae60;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+    }
+    .status-badge {
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    .item-image {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 3px solid #2ecc71;
+    }
+    .item-card {
+        border: 1px solid #27ae60;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: #f0f7f0;
+        transition: all 0.3s ease;
+    }
+    .item-card:hover {
+        box-shadow: 0 8px 25px rgba(39, 174, 96, 0.2);
+        transform: translateY(-5px);
+    }
+    .status-badge.status-Pending {
+        background-color: #ffd700;
+        color: #2c3e50;
+    }
+    .status-badge.status-Confirmed {
+        background-color: #ff9800;
+        color: white;
+    }
+    .status-badge.status-Completed {
+        background-color: #2ecc71;
+        color: white;
+    }
+    .status-badge.status-Rejected,
+    .status-badge.status-Cancelled {
+        background-color: #e74c3c;
+        color: white;
+    }
+    .btn-cancel {
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    .btn-cancel:hover {
+        background-color: #c0392b;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+    }
+    .btn-reason {
+        background-color: #2c3e50;
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    .btn-reason:hover {
+        background-color: #34495e;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(44, 62, 80, 0.3);
+    }
+</style>
 </head>
 <body>
     <?php include 'navbar.php'; ?>
@@ -223,7 +233,23 @@ if ($order_details['pickup_status'] === 'Rejected') {
 
             <!-- Rejection Reason Modal remains the same -->
             <?php if ($order_details['pickup_status'] === 'Rejected' && $rejection_reason): ?>
-            <!-- Modal content remains unchanged -->
+            <!-- Modal for displaying rejection reason -->
+            <div class="modal fade" id="rejectionModal" tabindex="-1" aria-labelledby="rejectionModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="rejectionModalLabel">Rejection Reason</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p><?= htmlspecialchars($rejection_reason) ?></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <?php endif; ?>
         </div>
     </div>
@@ -232,7 +258,21 @@ if ($order_details['pickup_status'] === 'Rejected') {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-    // JavaScript remains the same
+    function cancelOrder(cartId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, cancel it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = 'cancel_order.php?cart_id=' + cartId;
+            }
+        })
+    }
     </script>
 </body>
 </html>
