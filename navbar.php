@@ -100,6 +100,39 @@ if (session_status() === PHP_SESSION_NONE) {
                 box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             }
         }
+        .dropdown-menu {
+        border: none;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        padding: 0.5rem;
+        border-radius: 10px;
+    }
+
+    .dropdown-item {
+        padding: 0.7rem 1rem;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .dropdown-item:hover, 
+    .dropdown-item:focus {
+        background-color: var(--primary-green);
+        color: white;
+    }
+
+    .dropdown-item:active {
+        background-color: var(--secondary-green);
+        color: white;
+    }
+
+    .dropdown-divider {
+        margin: 0.5rem 0;
+        border-color: #e9ecef;
+    }
+
+    .dropdown-item i {
+        width: 20px;
+        text-align: center;
+    }
     </style>
 </head>
 <body>

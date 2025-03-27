@@ -8,52 +8,31 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+$user_id = $_SESSION['user_id'];
+
+// Check if user has a default or any active address
+$addressStmt = $conn->prepare("SELECT address_id FROM user_addresses 
+                               WHERE user_id = ? AND is_active = 1 
+                               LIMIT 1");
+$addressStmt->bind_param("i", $user_id);
+$addressStmt->execute();
+$addressResult = $addressStmt->get_result();
+$address = $addressResult->fetch_assoc();
+
+// If no address found, redirect immediately
+if (!$address) {
+    header("Location: addresses.php");
+    exit();
+}
+
 // Fetch active categories
 $categories = $conn->query("SELECT * FROM category WHERE is_active = 1");
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $user_id = $_SESSION['user_id'];
     $pickup_date = $_POST['pickup_date'];
 
-    // First try to get default address
-    $addressStmt = $conn->prepare("SELECT address_id FROM user_addresses 
-                                 WHERE user_id = ? AND is_default = 1 AND is_active = 1
-                                 LIMIT 1");
-    $addressStmt->bind_param("i", $user_id);
-    $addressStmt->execute();
-    $addressResult = $addressStmt->get_result();
-    $address = $addressResult->fetch_assoc();
-    
-    // If no default address, get any active address
-    if (!$address) {
-        $addressStmt = $conn->prepare("SELECT address_id FROM user_addresses 
-                                     WHERE user_id = ? AND is_active = 1
-                                     LIMIT 1");
-        $addressStmt->bind_param("i", $user_id);
-        $addressStmt->execute();
-        $addressResult = $addressStmt->get_result();
-        $address = $addressResult->fetch_assoc();
-    }
-
-    // If still no address found, redirect to add address page
-    if (!$address) {
-        echo "<script>
-                Swal.fire({
-                    title: 'No Address Found',
-                    text: 'Please add an address before creating an order',
-                    icon: 'warning',
-                    confirmButtonText: 'Add Address'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = 'addresses.php';
-                    }
-                });
-              </script>";
-        exit();
-    }
-
-    // Create a new cart entry with address_id and pickup_status
+    // Create a new cart entry
     $stmt = $conn->prepare("INSERT INTO cart (user_id, pickup_date, address_id, pickup_status) 
                           VALUES (?, ?, ?, ?)");
     $pickup_status = 'Pending';
@@ -63,22 +42,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Error creating cart: " . $stmt->error);
     }
     $cart_id = $conn->insert_id;
-
-    // Verify the cart was created with the correct status
-    $verifyStmt = $conn->prepare("SELECT pickup_status FROM cart WHERE id = ?");
-    $verifyStmt->bind_param("i", $cart_id);
-    $verifyStmt->execute();
-    $result = $verifyStmt->get_result();
-    $cart = $result->fetch_assoc();
-    
-    if (!$cart || $cart['pickup_status'] !== 'Pending') {
-        // Try to update the status if it wasn't set correctly
-        $updateStmt = $conn->prepare("UPDATE cart SET pickup_status = ? WHERE id = ?");
-        $updateStmt->bind_param("si", $pickup_status, $cart_id);
-        if (!$updateStmt->execute()) {
-            die("Error updating cart status: " . $updateStmt->error);
-        }
-    }
 
     // Process each uploaded item
     foreach ($_POST['product_id'] as $key => $product_id) {
@@ -120,6 +83,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     exit();
 }
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -263,25 +228,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         font-size: 16px;
         background-color: #f0f7f0;
     }
-    .table thead th {
-        background-color: #2ecc71;
-        color: white;
-        border: none;
-        text-transform: uppercase;
-    }
-    .table tbody tr {
-        background-color: white;
-        transition: all 0.3s ease;
-        border-left: 5px solid #2ecc71;
-    }
-    .table tbody tr:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(39, 174, 96, 0.1);
-    }
-    .category-row {
-        background-color: #f0f7f0 !important;
-        color: #2c3e50;
-    }
+    
+.table tbody tr {
+    background-color: white;
+    transition: all 0.3s ease;
+    border-left: 5px solid #2ecc71;
+}
+
+.table thead th {
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    text-transform: uppercase;
+}
+
+.text-primary {
+    color: #2ecc71 !important;
+}
+
+.btn-outline-primary {
+    color: #2ecc71;
+    border-color: #2ecc71;
+}
+
+.btn-outline-primary:hover {
+    background-color: #2ecc71;
+    border-color: #2ecc71;
+    color: white;
+}
+
+.text-secondary {
+    color: #27ae60 !important;
+}
 </style>
 <body>
     <?php include 'navbar.php'; ?>
@@ -289,26 +267,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="container">
         <!-- Add new chart section -->
         <div class="category-chart-card mb-4">
-            <div class="card-header bg-transparent border-0">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h3 class="mb-0">
-                        <i class="fas fa-box-open text-primary me-2"></i>
-                        Available Products by Category
-                    </h3>
-                    <button class="btn btn-outline-primary" id="toggleChart">
-                        <i class="fas fa-chart-bar me-2"></i>Show Product Details
-                    </button>
-                </div>
-            </div>
+        <div class="card-header bg-transparent border-0">
+    <div class="d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">
+            <i class="fas fa-box-open text-success me-2"></i>
+            Available Products by Category
+        </h3>
+        <button class="btn btn-outline-success" id="toggleChart">
+            <i class="fas fa-chart-bar me-2"></i>Show Product Details
+        </button>
+    </div>
+</div>
 
             <div class="card-body">
                 <!-- Search Section -->
                 <div class="row mb-4 search-section">
                     <div class="col-md-6">
                         <div class="input-group">
-                            <span class="input-group-text">
-                                <i class="fas fa-search text-primary"></i>
-                            </span>
+                        <span class="input-group-text">
+    <i class="fas fa-search" style="color: #2ecc71;"></i>
+</span>
                             <input type="text" class="form-control" id="productSearch" 
                                    placeholder="Search products, categories...">
                         </div>
@@ -324,15 +302,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <!-- Table Section -->
                 <div class="table-responsive">
                     <table class="table table-hover category-products-table" style="display: none;">
-                        <thead class="table-light">
-                            <tr>
-                                <th><i class="fas fa-tags me-2"></i>Category</th>
-                                <th><i class="fas fa-box me-2"></i>Product Name</th>
-                                <th><i class="fas fa-info-circle me-2"></i>Description</th>
-                                <th><i class="fas fa-rupee-sign me-2"></i>Price Per Piece</th>
-                                <th><i class="fas fa-clipboard-list me-2"></i>Category Info</th>
-                            </tr>
-                        </thead>
+                    <thead class="table-light">
+    <tr>
+        <th><i class="fas fa-tags me-2" style="color: #2ecc71;"></i>Category</th>
+        <th><i class="fas fa-box me-2" style="color: #2ecc71;"></i>Product Name</th>
+        <th><i class="fas fa-info-circle me-2" style="color: #2ecc71;"></i>Description</th>
+        <th><i class="fas fa-rupee-sign me-2" style="color: #2ecc71;"></i>Price Per Piece</th>
+        <th><i class="fas fa-clipboard-list me-2" style="color: #2ecc71;"></i>Category Info</th>
+    </tr>
+</thead>
                         <tbody>
                         </tbody>
                     </table>
@@ -536,22 +514,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         currentCategory = product.category_name;
                         
                         row.innerHTML = `
-                            <td>
-                                ${categoryCell ? `<i class="fas fa-folder-open text-primary me-2"></i>${categoryCell}` : ''}
-                            </td>
-                            <td>
-                                <i class="fas fa-box text-secondary me-2"></i>${product.product_name}
-                            </td>
-                            <td>${product.description}</td>
-                            <td>
-                                <i class="fas fa-rupee-sign me-1"></i>${product.base_price}
-                            </td>
-                            <td>
-                                <span class="badge bg-light text-dark">
-                                    <i class="fas fa-info-circle me-1"></i>${product.additional_info || '-'}
-                                </span>
-                            </td>
-                        `;
+    <td>
+        ${categoryCell ? `<i class="fas fa-folder-open text-success me-2"></i>${categoryCell}` : ''}
+    </td>
+    <td>
+        <i class="fas fa-box text-success me-2"></i>${product.product_name}
+    </td>
+    <td>${product.description}</td>
+    <td>
+        <i class="fas fa-rupee-sign text-success me-1"></i>${product.base_price}
+    </td>
+    <td>
+        <span class="badge bg-light text-success">
+            <i class="fas fa-info-circle me-1"></i>${product.additional_info || '-'}
+        </span>
+    </td>
+`;
                         
                         // Add background color to rows with new categories
                         if (categoryCell) {
@@ -604,23 +582,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             currentCategory = product.category_name;
                             
                             row.innerHTML = `
-                                <td>
-                                    ${categoryCell ? `<i class="fas fa-folder-open text-primary me-2"></i>${categoryCell}` : ''}
-                                </td>
-                                <td>
-                                    <i class="fas fa-box text-secondary me-2"></i>${product.product_name}
-                                </td>
-                                <td>${product.description}</td>
-                                <td>
-                                    <i class="fas fa-rupee-sign me-1"></i>${product.base_price}
-                                </td>
-                                <td>
-                                    <span class="badge bg-light text-dark">
-                                        <i class="fas fa-info-circle me-1"></i>${product.additional_info || '-'}
-                                    </span>
-                                </td>
-                            `;
-                            
+    <td>
+        ${categoryCell ? `<i class="fas fa-folder-open text-success me-2" style="color: #2ecc71;"></i>${categoryCell}` : ''}
+    </td>
+    <td>
+        <i class="fas fa-box text-success me-2" style="color: #2ecc71;"></i>${product.product_name}
+    </td>
+    <td>${product.description}</td>
+    <td>
+        <i class="fas fa-rupee-sign text-success me-1" style="color: #2ecc71;"></i>${product.base_price}
+    </td>
+    <td>
+        <span class="badge bg-light text-success">
+            <i class="fas fa-info-circle me-1" style="color: #2ecc71;"></i>${product.additional_info || '-'}
+        </span>
+    </td>
+`;
                             if (categoryCell) {
                                 row.style.backgroundColor = '#f8f9fa';
                             }
