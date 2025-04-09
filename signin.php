@@ -394,28 +394,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     function validateEmail() {
-        const email = document.getElementById("email").value.trim();
-        const error = document.getElementById("emailError");
-        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if (!regex.test(email)) {
-            error.textContent = "Enter a valid email address";
-            return false;
-        }
-
-        // Check if email already exists via AJAX
-        fetch("check_email.php?email=" + encodeURIComponent(email))
-            .then(response => response.json())
-            .then(data => {
-                if (data.exists) {
-                    error.textContent = "Email is already registered";
-                } else {
-                    error.textContent = "";
-                }
-            });
-
-        return true;
+    const emailInput = document.getElementById("email");
+    const email = emailInput.value.trim();
+    const errorElement = document.getElementById("emailError");
+    
+    // More comprehensive regex
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    
+    // Clear previous errors
+    errorElement.textContent = "";
+    emailInput.classList.remove("is-invalid");
+    
+    // Check if empty
+    if (!email) {
+        errorElement.textContent = "Email is required";
+        emailInput.classList.add("is-invalid");
+        return false;
     }
+    
+    // Validate format
+    if (!regex.test(email)) {
+        errorElement.textContent = "Please enter a valid email (e.g., example@gmail.com)";
+        emailInput.classList.add("is-invalid");
+        return false;
+    }
+    
+    return true;
+}
 
     function validatePhone() {
         const phone = document.getElementById("phone").value.trim();

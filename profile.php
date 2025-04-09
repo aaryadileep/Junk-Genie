@@ -52,13 +52,13 @@ $stmt_earnings->close();
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile | JunkGenie</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-            :root {
+       :root {
             --primary: #4CAF50;
             --primary-dark: #388E3C;
             --primary-light: #C8E6C9;
@@ -238,11 +238,24 @@ $stmt_earnings->close();
     border-color: #cc0000;
     color: white;
 }
+ 
+        .is-invalid {
+            border-color: #dc3545 !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+        
+        #phoneError {
+            color: #dc3545;
+            font-size: 0.875em;
+            margin-top: 0.25rem;
+        }
     </style>
-    
 </head>
-
 <body>
+ody>
     <!-- Navigation Header -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
         <div class="container">
@@ -346,8 +359,10 @@ $stmt_earnings->close();
                         </div>
                         <div class="mb-3">
                             <label class="form-label">New Phone Number</label>
-                            <input type="tel" class="form-control" id="newPhone" name="newPhone" pattern="[0-9]{10}" maxlength="10" required>
-                            <div class="invalid-feedback" id="phoneError">Please enter a valid 10-digit phone number.</div>
+                            <input type="tel" class="form-control" id="newPhone" name="newPhone" 
+                                   pattern="[6-9][0-9]{9}" maxlength="10" required
+                                   oninput="validatePhone(this)">
+                            <div class="invalid-feedback" id="phoneError"></div>
                         </div>
                         <button type="submit" class="btn btn-success w-100">Update Phone</button>
                     </form>
@@ -358,65 +373,91 @@ $stmt_earnings->close();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-document.getElementById('changePhoneForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const newPhone = document.getElementById('newPhone').value;
-    const phoneError = document.getElementById('phoneError');
-    
-    // Validate phone number
-    if (!/^[0-9]{10}$/.test(newPhone)) {
-        phoneError.textContent = 'Please enter a valid 10-digit phone number.';
-        phoneError.style.display = 'block';
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('newPhone', newPhone);
-
-    // Show loading state
-    const submitButton = this.querySelector('button[type="submit"]');
-    submitButton.disabled = true;
-    submitButton.innerHTML = 'Updating...';
-
-    fetch('update_phone.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Update displayed phone number
-            document.getElementById('displayPhone').textContent = newPhone;
-            
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('changePhoneModal'));
-            modal.hide();
-            
-            // Show success message
-            alert('Phone number updated successfully!');
-        } else {
-            phoneError.textContent = data.error || 'Failed to update phone number';
-            phoneError.style.display = 'block';
+    // Real-time phone number validation
+    function validatePhone(input) {
+        const phone = input.value;
+        const phoneError = document.getElementById('phoneError');
+        
+        // Clear previous error states
+        phoneError.textContent = '';
+        input.classList.remove('is-invalid');
+        
+        // Validate only numbers are entered
+        if (!/^[0-9]*$/.test(phone)) {
+            phoneError.textContent = 'Only numbers are allowed';
+            input.classList.add('is-invalid');
+            return false;
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        phoneError.textContent = 'An error occurred while updating the phone number';
-        phoneError.style.display = 'block';
-    })
-    .finally(() => {
-        // Reset button state
-        submitButton.disabled = false;
-        submitButton.innerHTML = 'Update Phone';
-    });
-});
-
-function confirmLogout() {
-    if (confirm('Are you sure you want to logout?')) {
-        window.location.href = 'logout.php';
+        
+        // Validate first digit is 6-9 (only when something is entered)
+        if (phone.length >= 1 && !/^[6-9]/.test(phone)) {
+            phoneError.textContent = 'Must start with 6, 7, 8 or 9';
+            input.classList.add('is-invalid');
+            return false;
+        }
+        
+        // Validate length (only show error when full 10 digits entered incorrectly)
+        if (phone.length === 10 && !/^[6-9][0-9]{9}$/.test(phone)) {
+            phoneError.textContent = 'Please enter exactly 10 digits starting with 6-9';
+            input.classList.add('is-invalid');
+            return false;
+        }
+        
+        return true;
     }
-}
+
+    // Form submission handler
+    document.getElementById('changePhoneForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const phoneInput = document.getElementById('newPhone');
+        const phone = phoneInput.value;
+        const phoneError = document.getElementById('phoneError');
+        
+        // Final validation
+        if (!/^[6-9][0-9]{9}$/.test(phone)) {
+            phoneError.textContent = 'Please enter a valid 10-digit number starting with 6-9';
+            phoneInput.classList.add('is-invalid');
+            return;
+        }
+
+        // Show loading state
+        const submitButton = this.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...';
+
+        // Send to server
+        fetch('update_phone.php', {
+            method: 'POST',
+            body: new FormData(this)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('displayPhone').textContent = phone;
+                bootstrap.Modal.getInstance(document.getElementById('changePhoneModal')).hide();
+                alert('Phone number updated successfully!');
+            } else {
+                phoneError.textContent = data.error || 'This phone number is already in use';
+                phoneInput.classList.add('is-invalid');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            phoneError.textContent = 'Network error - please try again';
+            phoneInput.classList.add('is-invalid');
+        })
+        .finally(() => {
+            submitButton.disabled = false;
+            submitButton.innerHTML = 'Update Phone';
+        });
+    });
+
+    function confirmLogout() {
+        if (confirm('Are you sure you want to logout?')) {
+            window.location.href = 'logout.php';
+        }
+    }
     </script>
 </body>
 </html>
